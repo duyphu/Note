@@ -5,4 +5,10 @@
     <color name="colorAccent">#FF4081</color>
     <color name="colorTitleText">#FFFFFF</color>
     <color name="colorControlNormal">#FFFFFF</color>
+
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorYealow">#FFBB22</color>
+    <color name="colorBlue">#77DDBB</color>
+    <color name="colorCyan">#66CCDD</color>
+    <color name="colorGray">#CCCCCC</color>
 </resources>

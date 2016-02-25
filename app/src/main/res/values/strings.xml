@@ -5,9 +5,9 @@
     <string name="action_add">Add</string>
 
     <!-- New Note Screen-->
-    <string name="action_camera">Camera</string>
-    <string name="action_change_background_color">Background Color</string>
-    <string name="action_save">Save</string>
+    <string name="action_insert_picture">Insert Picture</string>
+    <string name="action_choose_color">Choose Color</string>
+    <string name="action_done">Done</string>
     <string name="title_hint">Title</string>
     <string name="note_hint">Note</string>
     <string name="time_string">22/03/2016 10:10</string>

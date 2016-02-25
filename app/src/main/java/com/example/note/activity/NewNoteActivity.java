@@ -2,36 +2,44 @@ package com.example.note.activity;
 
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.Cursor;
-import android.graphics.BitmapFactory;
+import android.graphics.Bitmap;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.app.DialogFragment;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageView;
+import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.example.note.R;
 import com.example.note.config.Define;
-import com.example.note.fragment.TimePickerFragment;
+import com.example.note.custom.adapter.ImageListAdapter;
+import com.example.note.utils.FileUtil;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -39,12 +47,15 @@ import java.util.Date;
  * Created by phund on 2/24/2016.
  */
 public class NewNoteActivity extends AppCompatActivity {
-    private LinearLayout mLLSetAlarm;
-    private TextView mTVAlarm, mTVCreatDate;
-    private EditText mEDDate;
-    private EditText mEDTime;
     private static int REQUEST_CAMERA = 1;
     private static int SELECT_FILE = 2;
+    private LinearLayout llSetAlarm;
+    private LinearLayout llMainMew;
+    private TextView tvAlarm, tvCreatTime;
+    private EditText etDate ,etTime;
+    private GridView gvInsertPicture;
+    private ArrayList<String> mListpics;
+    private Dialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -56,46 +67,99 @@ public class NewNoteActivity extends AppCompatActivity {
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
-        mLLSetAlarm = (LinearLayout)findViewById(R.id.ll_set_alarm);
-        mTVAlarm = (TextView)findViewById(R.id.tv_alarm);
-        mTVCreatDate = (TextView)findViewById(R.id.tv_create_time);
-        mEDDate = (EditText)findViewById(R.id.et_date);
-        mEDTime = (EditText)findViewById(R.id.et_time);
-        mEDDate.setKeyListener(null);
-        mEDTime.setKeyListener(null);
+        llSetAlarm = (LinearLayout)findViewById(R.id.ll_set_alarm);
+        llMainMew = (LinearLayout)findViewById(R.id.ll_main_new);
+        tvAlarm = (TextView)findViewById(R.id.tv_alarm);
+        tvCreatTime = (TextView)findViewById(R.id.tv_create_time);
+        etDate = (EditText)findViewById(R.id.et_date);
+        etTime = (EditText)findViewById(R.id.et_time);
+        etDate.setKeyListener(null);
+        etTime.setKeyListener(null);
 
         // set default date and time
-        mEDTime.setText(Define.DEFAULT_TIME);
+        etTime.setText(Define.DEFAULT_TIME);
         Calendar calendar = Calendar.getInstance();
         DateFormat dateFormat = new SimpleDateFormat("d/MM/y");
         Date curDate = calendar.getTime();
-        mEDDate.setText(dateFormat.format(curDate));
+        etDate.setText(dateFormat.format(curDate));
         dateFormat = new SimpleDateFormat("d/MM/y H:m");
-        mTVCreatDate.setText(dateFormat.format(curDate));
+        tvCreatTime.setText(dateFormat.format(curDate));
+
+        mListpics = new ArrayList<String>();
+        gvInsertPicture = (GridView)findViewById(R.id.gv_insert_picture);
+        gvInsertPicture.setAdapter(new ImageListAdapter(this, mListpics));
+
+        gvInsertPicture.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String path = mListpics.get(position);
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setDataAndType(Uri.parse("file://" + path), "image/*");
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && null != data) {
+            if(requestCode == REQUEST_CAMERA){
+                //save file to picture note folder
+                Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
 
-//        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
-//            Uri selectedImage = data.getData();
-//            String[] filePathColumn = { MediaStore.Images.Media.DATA };
-//
-//            Cursor cursor = getContentResolver().query(selectedImage,
-//                    filePathColumn, null, null, null);
-//            cursor.moveToFirst();
-//
-//            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-//            String picturePath = cursor.getString(columnIndex);
-//            Log.i("Picture path",picturePath);
-//            cursor.close();
-//
-//            ImageView imageView = (ImageView) findViewById(R.id.imgView);
-//            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-//        }
+                FileUtil.createFolder(Define.PICTURE_NOTE_FOLDER);
 
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
 
+                Calendar calendar = Calendar.getInstance();
+                DateFormat dateFormat = new SimpleDateFormat("yMMd_Hms");
+                String fileName = Define.PICTURE_NOTE_FOLDER+"/IMG_"
+                        + dateFormat.format(calendar.getTime()) + "_"
+                        + System.currentTimeMillis() + ".jpg";
+                File destination = new File(fileName);
+                FileOutputStream fo;
+                try {
+                    destination.createNewFile();
+                    fo = new FileOutputStream(destination);
+                    fo.write(bytes.toByteArray());
+                    fo.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                mListpics.add(fileName);
+                gvInsertPicture.setAdapter(new ImageListAdapter(this,mListpics));
+            } else if (requestCode == SELECT_FILE){
+                try {
+                    FileUtil.createFolder(Define.PICTURE_NOTE_FOLDER);
+
+                    Uri selectedImage = data.getData();
+                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
+
+                    Cursor cursor = getContentResolver().query(selectedImage,
+                            filePathColumn, null, null, null);
+                    cursor.moveToFirst();
+
+                    int columnIndex = cursor.getColumnIndexOrThrow(filePathColumn[0]);
+                    String picturePath = cursor.getString(columnIndex);
+
+                    // copy file to picture note folder
+                    String fileName = picturePath.substring(picturePath.lastIndexOf("/") + 1);
+                    String newPath = Define.PICTURE_NOTE_FOLDER + "/" + fileName;
+                    FileUtil.copy(new File(picturePath), new File(newPath));
+
+                    mListpics.add(newPath);
+                    gvInsertPicture.setAdapter(new ImageListAdapter(this, mListpics));
+                    cursor.close();
+                } catch (NullPointerException ne){
+                    ne.printStackTrace();
+                }
+            }
+        }
     }
 
     @Override
@@ -107,24 +171,20 @@ public class NewNoteActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_camera) {
-            selectImage();
-        } else if(id == R.id.action_change_background_color){
-
-        } else if(id == R.id.action_save){
+        if (id == R.id.action_insert_picture) {
+            insertPicture();
+        } else if(id == R.id.action_choose_color){
+            chooseColor();
+        } else if(id == R.id.action_done){
 
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void selectImage() {
+    private void insertPicture() {
         final CharSequence[] items = { "Take Photo", "Choose Photo"};
         AlertDialog.Builder builder = new AlertDialog.Builder(NewNoteActivity.this);
         builder.setTitle("Insert Picture");
@@ -134,32 +194,36 @@ public class NewNoteActivity extends AppCompatActivity {
                 if (items[item].equals("Take Photo")) {
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     startActivityForResult(intent, REQUEST_CAMERA);
-                } else if (items[item].equals("Choose from Library")) {
+                } else if (items[item].equals("Choose Photo")) {
                     Intent intent = new Intent(
                             Intent.ACTION_PICK,
                             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     intent.setType("image/*");
-                    startActivityForResult(
-                            Intent.createChooser(intent, "Select File"),
-                            SELECT_FILE);
-                } else if (items[item].equals("Cancel")) {
-                    dialog.dismiss();
+                    startActivityForResult(intent, SELECT_FILE);
                 }
             }
         });
         builder.show();
     }
 
+    public void chooseColor(){
+        dialog = new Dialog(NewNoteActivity.this);
+        dialog.setTitle("Choose Color");
+        dialog.setContentView(R.layout.dialog_choose_color);
+        dialog.show();
+//        builder.s
+    }
+
     public void tvAlarmOnClick(View v){
-        if(mLLSetAlarm.getVisibility() != View.VISIBLE){
-            mLLSetAlarm.setVisibility(View.VISIBLE);
+        if(llSetAlarm.getVisibility() != View.VISIBLE){
+            llSetAlarm.setVisibility(View.VISIBLE);
             v.setVisibility(View.GONE);
         }
     }
 
     public void ivCloseOnClick(View v){
-        mLLSetAlarm.setVisibility(View.GONE);
-        mTVAlarm.setVisibility(View.VISIBLE);
+        llSetAlarm.setVisibility(View.GONE);
+        tvAlarm.setVisibility(View.VISIBLE);
     }
 
     public void etTimeOnClick(View v){
@@ -193,5 +257,20 @@ public class NewNoteActivity extends AppCompatActivity {
         }, mYear, mMonth, mDay);
         mDatePicker.setTitle("Select Date");
         mDatePicker.show();
+    }
+
+    public void tvColorOnClick(View v){
+        TextView tv = (TextView)v;
+        ColorDrawable colorDrawable = (ColorDrawable) tv.getBackground();
+        llMainMew.setBackgroundColor(colorDrawable.getColor());
+        // convert color value to color code
+//        String hexColor = String.format("#%06X", (0xFFFFFF & intColor));
+//        Log.i("Color", Color.parseColor("#ffffff")+"");
+        dialog.dismiss();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 }
