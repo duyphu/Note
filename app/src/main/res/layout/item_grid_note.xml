@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+    <LinearLayout
+        android:id="@+id/ll_content_note"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:background="@color/colorWhite"
+        android:layout_margin="@dimen/activity_vertical_margin"
+        android:padding="@dimen/text_padding"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/tv_title"
+                android:textStyle="bold"
+                android:padding="@dimen/text_padding"
+                android:textSize="@dimen/title_size"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"/>
+            <ImageView
+                android:id="@+id/iv_alarm"
+                android:padding="@dimen/text_padding"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorLine"/>
+
+        <TextView
+            android:padding="@dimen/text_padding"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/note_height"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@+id/tv_note"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:padding="@dimen/text_padding"
+            android:textSize="@dimen/create_date_size"
+            android:id="@+id/tv_create_time"/>
+    </LinearLayout>
+
+</LinearLayout>

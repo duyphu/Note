@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:fitsSystemWindows="true"
+    android:background="@color/colorBackgroundMain"
     tools:context=".activity.MainActivity">
 
     <android.support.design.widget.AppBarLayout
@@ -24,6 +25,7 @@
     </android.support.design.widget.AppBarLayout>
     <GridView
         android:id="@+id/gv_note_list"
+        android:numColumns="2"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     </GridView>
