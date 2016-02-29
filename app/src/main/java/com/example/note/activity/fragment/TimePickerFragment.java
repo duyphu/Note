@@ -1,4 +1,4 @@
-package com.example.note.fragment;
+package com.example.note.activity.fragment;
 
 import android.app.Dialog;
 import android.app.TimePickerDialog;

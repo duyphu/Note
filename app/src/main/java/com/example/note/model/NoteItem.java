@@ -127,6 +127,7 @@ public class NoteItem {
     public void create(Context context){
         if (isCreate()) {
             NoteTable noteTable = new NoteTable(context);
+            mTitle = mTitle.equals("") ? ((mNote.equals("") ? Define.DEFAULT_TITLE : mNote)) : mTitle;
             noteTable.insert(convertToHashMap());
         }
     }

@@ -1,27 +1,29 @@
 package com.example.note.activity;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.example.note.R;
+import com.example.note.activity.base.BaseActivity;
 import com.example.note.custom.adapter.NoteListAdapter;
 import com.example.note.db.table.NoteTable;
 import com.example.note.model.NoteItem;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
     private GridView gvNoteList;
+    private ArrayList<Integer> mIds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,15 +32,29 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.t_main);
         setSupportActionBar(toolbar);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setLogo(R.mipmap.notes);
+        actionBar.setDisplayUseLogoEnabled(true);
+
+        mIds = new ArrayList<Integer>();
         NoteTable noteTable = new NoteTable(this);
-        ArrayList<NoteItem> list = noteTable.getAll();
+        final ArrayList<NoteItem> list = noteTable.getAll();
+        for (int i = 0; i < list.size(); i++) {
+            mIds.add(list.get(i).getId());
+        }
         gvNoteList = (GridView)findViewById(R.id.gv_note_list);
         NoteListAdapter adapter = new NoteListAdapter(this, R.layout.item_grid_note, list);
         gvNoteList.setAdapter(adapter);
         gvNoteList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                NoteItem item = list.get(position);
+                int noteId = item.getId();
+                Intent intent =  new Intent(MainActivity.this, OpenNoteFragmentActivyty.class);
+                intent.putExtra("noteId", noteId);
+                intent.putExtra("listId", mIds);
+                startActivity(intent);
             }
         });
     }
@@ -66,9 +82,13 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_add) {
             Intent intent = new Intent(MainActivity.this, NewNoteActivity.class);
             startActivity(intent);
-            finish();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 }

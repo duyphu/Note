@@ -12,10 +12,8 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -30,6 +28,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.example.note.R;
+import com.example.note.activity.base.BaseActivity;
 import com.example.note.config.Define;
 import com.example.note.custom.adapter.ImageListAdapter;
 import com.example.note.model.NoteItem;
@@ -49,7 +48,7 @@ import java.util.Date;
 /**
  * Created by phund on 2/24/2016.
  */
-public class NewNoteActivity extends AppCompatActivity {
+public class NewNoteActivity extends BaseActivity {
     private static int REQUEST_CAMERA = 1;
     private static int SELECT_FILE = 2;
     private LinearLayout llSetAlarm;
@@ -70,6 +69,9 @@ public class NewNoteActivity extends AppCompatActivity {
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setLogo(R.mipmap.notes);
+        actionBar.setDisplayUseLogoEnabled(true);
+
         llSetAlarm = (LinearLayout)findViewById(R.id.ll_set_alarm);
         llMainMew = (LinearLayout)findViewById(R.id.ll_main_new);
         tvAlarm = (TextView)findViewById(R.id.tv_alarm);
@@ -191,8 +193,15 @@ public class NewNoteActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_new_note, menu);
+        getMenuInflater().inflate(R.menu.menu_top_note, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu (Menu menu) {
+        menu.findItem(R.id.action_new).setVisible(false);
         return true;
     }
 

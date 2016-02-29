@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:orientation="vertical"
         android:background="@color/colorWhite"
-        android:layout_margin="@dimen/activity_vertical_margin"
+        android:layout_margin="@dimen/item_grid_note_margin"
         android:padding="@dimen/text_padding"
         android:layout_height="match_parent">
         <LinearLayout
@@ -16,6 +16,7 @@
             android:layout_height="wrap_content">
             <TextView
                 android:id="@+id/tv_title"
+                android:maxLines="@integer/title_line_number"
                 android:textStyle="bold"
                 android:padding="@dimen/text_padding"
                 android:textSize="@dimen/title_size"
@@ -38,6 +39,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/note_height"
             android:textAppearance="?android:attr/textAppearanceMedium"
+            android:maxLines="@integer/note_line_number"
             android:id="@+id/tv_note"/>
         <TextView
             android:layout_width="match_parent"
