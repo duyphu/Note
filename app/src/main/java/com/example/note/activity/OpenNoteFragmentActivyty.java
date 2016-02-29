@@ -1,7 +1,9 @@
 package com.example.note.activity;
 
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -19,6 +21,7 @@ import android.widget.ImageButton;
 import com.example.note.R;
 import com.example.note.activity.base.BaseActivity;
 import com.example.note.activity.fragment.ScreenSlidePageFragment;
+import com.example.note.db.table.NoteTable;
 
 import java.util.ArrayList;
 
@@ -30,7 +33,7 @@ public class OpenNoteFragmentActivyty extends BaseActivity {
     private PagerAdapter mPagerAdapter;
     private static final int NUM_PAGES = 5;
     private Toolbar mToolbarBottom;
-    private int mNoteId;
+    private int mPosition;
     private ArrayList<Integer> mIds;
 
     @Override
@@ -47,29 +50,19 @@ public class OpenNoteFragmentActivyty extends BaseActivity {
 
         mToolbarBottom = (Toolbar) findViewById(R.id.t_bottom_note);
 
-        mNoteId = getIntent().getIntExtra("noteId", 0);
+        int noteId = getIntent().getIntExtra("noteId", 0);
         mIds = getIntent().getIntegerArrayListExtra("listId");
+        mPosition  = mIds.indexOf(noteId);
 
         mPager = (ViewPager) findViewById(R.id.pager);
         mPagerAdapter = new ScreenSlidePagerAdapter(getFragmentManager());
         mPager.setAdapter(mPagerAdapter);
+//        mPager.setCurrentItem(mPosition);
         mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                // When changing pages, reset the action bar actions since they are dependent
-                // on which page is currently active. An alternative approach is to have each
-                // fragment expose actions itself (rather than the activity exposing actions),
-                // but for simplicity, the activity provides the actions in this sample.
-//                invalidateOptionsMenu();
-                int resId;
-                if(mPager.getCurrentItem() == mPagerAdapter.getCount() - 1){
-                    resId = R.drawable.ic_navigate_next_disable;
-                } else {
-                    resId = R.drawable.ic_navigate_next;
-                }
-                ImageButton mImageButton = (ImageButton)mToolbarBottom.findViewById(R.id.ib_next);
-                mImageButton.setImageResource(resId);
-
+                mPosition = position;
+                invalidateOptionsMenu();
             }
         });
     }
@@ -78,7 +71,23 @@ public class OpenNoteFragmentActivyty extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.menu_top_note, menu);
-        Log.i("menu length", menu.size()+"");
+        int resId;
+        if(mPager.getCurrentItem() == mPagerAdapter.getCount() - 1){
+            resId = R.drawable.ic_navigate_next_disable;
+        } else {
+            resId = R.drawable.ic_navigate_next;
+        }
+        ImageButton ibNext = (ImageButton)mToolbarBottom.findViewById(R.id.ib_next);
+        ibNext.setImageResource(resId);
+
+        if(mPager.getCurrentItem() == 0){
+            resId = R.drawable.ic_navigate_previous_disable;
+        } else {
+            resId = R.drawable.ic_navigate_previous;
+        }
+        ImageButton ibPrev = (ImageButton)mToolbarBottom.findViewById(R.id.ib_prev);
+        ibPrev.setImageResource(resId);
+
 //        menu.findItem(R.id.action_previous).setEnabled(mPager.getCurrentItem() > 0);
 //
 //        // Add either a "next" or "finish" button to the action bar, depending on which page
@@ -117,7 +126,7 @@ public class OpenNoteFragmentActivyty extends BaseActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return ScreenSlidePageFragment.create(position);
+            return ScreenSlidePageFragment.create(position, mIds);
         }
 
         @Override
@@ -139,6 +148,25 @@ public class OpenNoteFragmentActivyty extends BaseActivity {
     }
 
     public void ibDeleteOnClick(View v){
-
+        AlertDialog dialog = new AlertDialog.Builder(OpenNoteFragmentActivyty.this).create();
+        dialog.setTitle("Confirm Delete");
+        dialog.setMessage("Are you sure you want to delete this?");
+        dialog.setCancelable(false);
+        dialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int buttonId) {
+                        NoteTable noteTable = new NoteTable(OpenNoteFragmentActivyty.this);
+                        noteTable.delete(mIds.get(mPosition));
+                        dialog.dismiss();
+                        finish();
+                    }
+                });
+        dialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int buttonId) {
+                        dialog.dismiss();
+                    }
+                });
+        dialog.show();
     }
 }

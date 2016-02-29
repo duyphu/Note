@@ -51,12 +51,14 @@ public class MainActivity extends BaseActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 NoteItem item = list.get(position);
                 int noteId = item.getId();
-                Intent intent =  new Intent(MainActivity.this, OpenNoteFragmentActivyty.class);
+                Intent intent = new Intent(MainActivity.this, OpenNoteFragmentActivyty.class);
                 intent.putExtra("noteId", noteId);
                 intent.putExtra("listId", mIds);
                 startActivity(intent);
             }
         });
+
+        Log.i("MainActivity", " onCreat");
     }
 
     protected void onResume(){
@@ -87,8 +89,8 @@ public class MainActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-    }
+//    @Override
+//    public void onConfigurationChanged(Configuration newConfig) {
+//        super.onConfigurationChanged(newConfig);
+//    }
 }

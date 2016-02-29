@@ -10,8 +10,10 @@ import com.example.note.config.Define;
 import com.example.note.db.DatabaseManager;
 import com.example.note.model.NoteItem;
 
+import java.lang.reflect.Array;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -54,6 +56,40 @@ public class NoteTable {
         db.close();
     }
 
+    public void delete(int id){
+        SQLiteDatabase db = mDatabaseManager.getWritableDatabase();
+        db.delete(Define.TABLE_NAME, Define.COLUMN_ID+"="+id,null);
+    }
+
+    public NoteItem getOne(int id){
+        SQLiteDatabase db = mDatabaseManager.getReadableDatabase();
+        NoteItem noteItem = new NoteItem();
+        String query  = "SELECT * FROM "+Define.TABLE_NAME+" WHERE "
+                +Define.COLUMN_ID+" = "+id;
+        try {
+            Cursor cursor = db.rawQuery(query, null);
+            if (cursor.moveToFirst()) {
+                noteItem.setId(cursor.getInt(cursor.getColumnIndexOrThrow(Define.COLUMN_ID)));
+                noteItem.setTitle(cursor.getString(cursor.getColumnIndexOrThrow(Define.COLUMN_TITLE)));
+                noteItem.setCreateTime(
+                        cursor.getString(cursor.getColumnIndexOrThrow(Define.COLUMN_CREATE_TIME)));
+                noteItem.setNote(cursor.getString(cursor.getColumnIndexOrThrow(Define.COLUMN_NOTE)));
+                noteItem.setAlarmTime(
+                        cursor.getString(cursor.getColumnIndexOrThrow(Define.COLUMN_ALARM_TIME)));
+                noteItem.setColor(cursor.getString(cursor.getColumnIndexOrThrow(Define.COLUMN_COLOR)));
+                String pictures =
+                        cursor.getString(cursor.getColumnIndexOrThrow(Define.COLUMN_PICTURES));
+                ArrayList<String> list = new ArrayList<String>(Arrays.asList(pictures.split(",")));
+                noteItem.setPictures(list);
+            }
+        } catch(NullPointerException npe){
+            npe.printStackTrace();
+        } finally {
+            db.close();
+        }
+        return noteItem;
+    }
+
     public ArrayList<NoteItem> getAll(){
         // return array list alarm item
         SQLiteDatabase db = mDatabaseManager.getReadableDatabase();
@@ -70,7 +106,8 @@ public class NoteTable {
                             cursor.getString(cursor.getColumnIndexOrThrow(Define.COLUMN_NOTE)),
                             cursor.getString(cursor.getColumnIndexOrThrow(Define.COLUMN_CREATE_TIME)),
                             cursor.getString(cursor.getColumnIndexOrThrow(Define.COLUMN_ALARM_TIME)),
-                            cursor.getString(cursor.getColumnIndexOrThrow(Define.COLUMN_COLOR))
+                            cursor.getString(cursor.getColumnIndexOrThrow(Define.COLUMN_COLOR)),
+                            null
                     );
                     list.add(item);
                 } while (cursor.moveToNext());

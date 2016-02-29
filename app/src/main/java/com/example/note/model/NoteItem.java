@@ -32,13 +32,14 @@ public class NoteItem {
         mPictures = new ArrayList<String>();
     }
 
-    public NoteItem(int id, String title, String note, String createTime,  String alarmTime, String color){
+    public NoteItem(int id, String title, String note, String createTime,  String alarmTime, String color, ArrayList<String> list){
         mId = id;
         mTitle = title;
         mNote = note;
         mCreateTime = createTime;
         mAlarmTime = alarmTime;
         mColor = color;
+        mPictures = list;
     }
 
     public String getCreateTime() {
