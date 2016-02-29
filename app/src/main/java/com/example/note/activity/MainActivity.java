@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.example.note.R;
@@ -34,7 +35,12 @@ public class MainActivity extends AppCompatActivity {
         gvNoteList = (GridView)findViewById(R.id.gv_note_list);
         NoteListAdapter adapter = new NoteListAdapter(this, R.layout.item_grid_note, list);
         gvNoteList.setAdapter(adapter);
-
+        gvNoteList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                
+            }
+        });
     }
 
     protected void onResume(){
