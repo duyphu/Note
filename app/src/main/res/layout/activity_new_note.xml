@@ -34,6 +34,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/title_hint"
+            android:layout_marginBottom="@dimen/activity_horizontal_margin"
             android:id="@+id/et_title"/>
         <EditText
             android:layout_width="match_parent"
@@ -41,26 +42,30 @@
             android:inputType="textMultiLine"
             android:ems="10"
             android:hint="@string/note_hint"
+            android:layout_marginBottom="@dimen/activity_horizontal_margin"
             android:id="@+id/et_note"
             android:layout_gravity="center_horizontal"/>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="@dimen/alarm_height">
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:src="@drawable/ic_alarm"/>
             <TextView
                 android:id="@+id/tv_alarm"
-                android:padding="@dimen/text_padding"
+                android:textSize="@dimen/text_alarm_size"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:text="@string/alarm_name"
                 android:onClick="tvAlarmOnClick"/>
             <LinearLayout
                 android:visibility="invisible"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:id="@+id/ll_set_alarm">
                 <EditText
                     android:layout_width="wrap_content"
@@ -70,6 +75,7 @@
                     android:inputType="date"
                     android:focusable="false"
                     android:onClick="etDateOnClick"
+                    android:layout_gravity="center_vertical"
                     android:id="@+id/et_date"/>
                 <EditText
                     android:layout_width="wrap_content"
@@ -79,11 +85,13 @@
                     android:inputType="time"
                     android:focusable="false"
                     android:onClick="etTimeOnClick"
+                    android:layout_gravity="center_vertical"
                     android:id="@+id/et_time"/>
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_close"
+                    android:layout_gravity="center_vertical"
                     android:onClick="ivCloseOnClick"/>
             </LinearLayout>
 

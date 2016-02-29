@@ -12,10 +12,12 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +32,7 @@ import android.widget.TimePicker;
 import com.example.note.R;
 import com.example.note.config.Define;
 import com.example.note.custom.adapter.ImageListAdapter;
+import com.example.note.model.NoteItem;
 import com.example.note.utils.FileUtil;
 
 import java.io.ByteArrayOutputStream;
@@ -52,10 +55,10 @@ public class NewNoteActivity extends AppCompatActivity {
     private LinearLayout llSetAlarm;
     private LinearLayout llMainMew;
     private TextView tvAlarm, tvCreatTime;
-    private EditText etDate ,etTime;
+    private EditText etDate ,etTime, etTitle, etNote;
     private GridView gvInsertPicture;
-    private ArrayList<String> mListpics;
-    private Dialog dialog;
+    private Dialog dChooseColor;
+    private NoteItem mNoteItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -71,6 +74,8 @@ public class NewNoteActivity extends AppCompatActivity {
         llMainMew = (LinearLayout)findViewById(R.id.ll_main_new);
         tvAlarm = (TextView)findViewById(R.id.tv_alarm);
         tvCreatTime = (TextView)findViewById(R.id.tv_create_time);
+        etTitle = (EditText)findViewById(R.id.et_title);
+        etNote = (EditText)findViewById(R.id.et_note);
         etDate = (EditText)findViewById(R.id.et_date);
         etTime = (EditText)findViewById(R.id.et_time);
         etDate.setKeyListener(null);
@@ -85,14 +90,14 @@ public class NewNoteActivity extends AppCompatActivity {
         dateFormat = new SimpleDateFormat("d/MM/y H:m");
         tvCreatTime.setText(dateFormat.format(curDate));
 
-        mListpics = new ArrayList<String>();
+        mNoteItem = new NoteItem();
         gvInsertPicture = (GridView)findViewById(R.id.gv_insert_picture);
-        gvInsertPicture.setAdapter(new ImageListAdapter(this, mListpics));
+        gvInsertPicture.setAdapter(new ImageListAdapter(this, mNoteItem.getPictures()));
 
         gvInsertPicture.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String path = mListpics.get(position);
+                String path = mNoteItem.getPictures().get(position);
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setDataAndType(Uri.parse("file://" + path), "image/*");
                 startActivity(intent);
@@ -131,8 +136,10 @@ public class NewNoteActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                mListpics.add(fileName);
-                gvInsertPicture.setAdapter(new ImageListAdapter(this,mListpics));
+                ArrayList<String> tmp = mNoteItem.getPictures();
+                tmp.add(fileName);
+                mNoteItem.setPictures(tmp);
+                gvInsertPicture.setAdapter(new ImageListAdapter(this, mNoteItem.getPictures()));
             } else if (requestCode == SELECT_FILE){
                 try {
                     FileUtil.createFolder(Define.PICTURE_NOTE_FOLDER);
@@ -152,13 +159,33 @@ public class NewNoteActivity extends AppCompatActivity {
                     String newPath = Define.PICTURE_NOTE_FOLDER + "/" + fileName;
                     FileUtil.copy(new File(picturePath), new File(newPath));
 
-                    mListpics.add(newPath);
-                    gvInsertPicture.setAdapter(new ImageListAdapter(this, mListpics));
+                    ArrayList<String> tmp = mNoteItem.getPictures();
+                    tmp.add(newPath);
+                    mNoteItem.setPictures(tmp);
+                    gvInsertPicture.setAdapter(new ImageListAdapter(this, mNoteItem.getPictures()));
                     cursor.close();
                 } catch (NullPointerException ne){
                     ne.printStackTrace();
                 }
             }
+        }
+    }
+
+    private void getDataToSave(){
+        mNoteItem.setTitle(etTitle.getText().toString());
+        mNoteItem.setNote(etNote.getText().toString());
+        if (tvAlarm.getVisibility() != View.VISIBLE) {
+            String alarmTime = etDate.getText() + " " + etTime.getText() + ":00";
+            mNoteItem.setAlarmTime(alarmTime);
+        }
+        mNoteItem.setCreateTime(tvCreatTime.getText() + ":00");
+    }
+    @Override
+    protected void onResume(){
+        super.onResume();
+        if(mNoteItem.getId() != 0) {
+            getDataToSave();
+            mNoteItem.update(this);
         }
     }
 
@@ -178,23 +205,26 @@ public class NewNoteActivity extends AppCompatActivity {
         } else if(id == R.id.action_choose_color){
             chooseColor();
         } else if(id == R.id.action_done){
-
+            getDataToSave();
+            mNoteItem.create(this);
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
     }
 
     private void insertPicture() {
-        final CharSequence[] items = { "Take Photo", "Choose Photo"};
         AlertDialog.Builder builder = new AlertDialog.Builder(NewNoteActivity.this);
         builder.setTitle("Insert Picture");
-        builder.setItems(items, new DialogInterface.OnClickListener() {
+        builder.setItems(Define.DIALOG_CHOOSE_COLOR_ITEMS, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
-                if (items[item].equals("Take Photo")) {
+                if (Define.DIALOG_CHOOSE_COLOR_ITEMS[item].equals("Take Photo")) {
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                     startActivityForResult(intent, REQUEST_CAMERA);
-                } else if (items[item].equals("Choose Photo")) {
+                } else if (Define.DIALOG_CHOOSE_COLOR_ITEMS[item].equals("Choose Photo")) {
                     Intent intent = new Intent(
                             Intent.ACTION_PICK,
                             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -207,10 +237,10 @@ public class NewNoteActivity extends AppCompatActivity {
     }
 
     public void chooseColor(){
-        dialog = new Dialog(NewNoteActivity.this);
-        dialog.setTitle("Choose Color");
-        dialog.setContentView(R.layout.dialog_choose_color);
-        dialog.show();
+        dChooseColor = new Dialog(NewNoteActivity.this);
+        dChooseColor.setTitle("Choose Color");
+        dChooseColor.setContentView(R.layout.dialog_choose_color);
+        dChooseColor.show();
 //        builder.s
     }
 
@@ -262,11 +292,13 @@ public class NewNoteActivity extends AppCompatActivity {
     public void tvColorOnClick(View v){
         TextView tv = (TextView)v;
         ColorDrawable colorDrawable = (ColorDrawable) tv.getBackground();
-        llMainMew.setBackgroundColor(colorDrawable.getColor());
+        int intColor = colorDrawable.getColor();
+        llMainMew.setBackgroundColor(intColor);
         // convert color value to color code
-//        String hexColor = String.format("#%06X", (0xFFFFFF & intColor));
+        String hexColor = String.format("#%06X", (0xFFFFFF & intColor));
+        mNoteItem.setColor(hexColor);
 //        Log.i("Color", Color.parseColor("#ffffff")+"");
-        dialog.dismiss();
+        dChooseColor.dismiss();
     }
 
     @Override

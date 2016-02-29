@@ -10,17 +10,31 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.GridView;
 
 import com.example.note.R;
+import com.example.note.custom.adapter.NoteListAdapter;
+import com.example.note.db.table.NoteTable;
+import com.example.note.model.NoteItem;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+    private GridView gvNoteList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.t_main);
         setSupportActionBar(toolbar);
+        NoteTable noteTable = new NoteTable(this);
+        ArrayList<NoteItem> list = noteTable.getAll();
+        gvNoteList = (GridView)findViewById(R.id.gv_note_list);
+        NoteListAdapter adapter = new NoteListAdapter(this, R.layout.item_grid_note, list);
+        gvNoteList.setAdapter(adapter);
+
     }
 
     protected void onResume(){
@@ -46,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_add) {
             Intent intent = new Intent(MainActivity.this, NewNoteActivity.class);
             startActivity(intent);
+            finish();
         }
 
         return super.onOptionsItemSelected(item);

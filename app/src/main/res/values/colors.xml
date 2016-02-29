@@ -10,5 +10,8 @@
     <color name="colorYealow">#FFBB22</color>
     <color name="colorBlue">#77DDBB</color>
     <color name="colorCyan">#66CCDD</color>
-    <color name="colorGray">#CCCCCC</color>
+    <color name="colorGray">#CCCCCC</color>\
+
+    <color name="colorBackgroundMain">#DDDDDD</color>
+    <color name="colorLine">#555555</color>
 </resources>
