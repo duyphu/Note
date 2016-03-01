@@ -51,8 +51,8 @@ public class NoteListAdapter extends ArrayAdapter<NoteItem> {
         tvTitle.setText(noteItem.getTitle());
         tvNote.setText(noteItem.getNote());
         try {
-            DateFormat fromFormat = new SimpleDateFormat("d/MM/y H:m:s");
-            DateFormat toFormat = new SimpleDateFormat("d/MM H:m");
+            DateFormat fromFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            DateFormat toFormat = new SimpleDateFormat("dd/MM HH:mm");
             Date date = fromFormat.parse(noteItem.getCreateTime());
             tvCreateTime.setText(toFormat.format(date));
         } catch (ParseException pe){

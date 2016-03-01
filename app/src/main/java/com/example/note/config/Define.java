@@ -46,4 +46,7 @@ public class Define {
             + COLUMN_PICTURES + TEXT_TYPE + NOT_NULL_TYPE + COMMA_STEP
             + COLUMN_ALARM_TIME + DATETIME_TYPE + NOT_NULL_TYPE + BRACKET_CLOSE;
 
+
+    public static int REQUEST_CAMERA = 1;
+    public static int SELECT_FILE = 2;
 }

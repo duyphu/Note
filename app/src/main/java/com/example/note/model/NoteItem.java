@@ -104,12 +104,6 @@ public class NoteItem {
         } else return false;
     }
 
-    private boolean isUpdate(){
-        if(!mTitle.equals("") && mId != 0){
-            return true;
-        } else return false;
-    }
-
     private HashMap<String, String> convertToHashMap(){
         if(mTitle == ""){
             if(mNote != "") mTitle = mNote;
@@ -134,10 +128,8 @@ public class NoteItem {
     }
 
     public void update(Context context){
-        if(isUpdate()){
-            NoteTable noteTable = new NoteTable(context);
-            noteTable.update(convertToHashMap(), mId + "");
-        }
+        NoteTable noteTable = new NoteTable(context);
+        noteTable.update(convertToHashMap(), mId + "");
     }
 
     public String toString(){

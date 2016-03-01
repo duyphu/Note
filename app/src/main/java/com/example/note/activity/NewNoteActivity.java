@@ -32,6 +32,7 @@ import com.example.note.activity.base.BaseActivity;
 import com.example.note.config.Define;
 import com.example.note.custom.adapter.ImageListAdapter;
 import com.example.note.model.NoteItem;
+import com.example.note.utils.DateUtil;
 import com.example.note.utils.FileUtil;
 
 import java.io.ByteArrayOutputStream;
@@ -49,15 +50,13 @@ import java.util.Date;
  * Created by phund on 2/24/2016.
  */
 public class NewNoteActivity extends BaseActivity {
-    private static int REQUEST_CAMERA = 1;
-    private static int SELECT_FILE = 2;
-    private LinearLayout llSetAlarm;
-    private LinearLayout llMainMew;
-    private TextView tvAlarm, tvCreatTime;
-    private EditText etDate ,etTime, etTitle, etNote;
-    private GridView gvInsertPicture;
-    private Dialog dChooseColor;
-    private NoteItem mNoteItem;
+    protected LinearLayout llSetAlarm;
+    protected LinearLayout llMainNew;
+    protected TextView tvAlarm, tvCreatTime;
+    protected EditText etDate ,etTime, etTitle, etNote;
+    protected GridView gvInsertPicture;
+    protected Dialog dChooseColor;
+    protected NoteItem mNoteItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -73,7 +72,7 @@ public class NewNoteActivity extends BaseActivity {
         actionBar.setDisplayUseLogoEnabled(true);
 
         llSetAlarm = (LinearLayout)findViewById(R.id.ll_set_alarm);
-        llMainMew = (LinearLayout)findViewById(R.id.ll_main_new);
+        llMainNew = (LinearLayout)findViewById(R.id.ll_main_new);
         tvAlarm = (TextView)findViewById(R.id.tv_alarm);
         tvCreatTime = (TextView)findViewById(R.id.tv_create_time);
         etTitle = (EditText)findViewById(R.id.et_title);
@@ -86,10 +85,10 @@ public class NewNoteActivity extends BaseActivity {
         // set default date and time
         etTime.setText(Define.DEFAULT_TIME);
         Calendar calendar = Calendar.getInstance();
-        DateFormat dateFormat = new SimpleDateFormat("d/MM/y");
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/y");
         Date curDate = calendar.getTime();
         etDate.setText(dateFormat.format(curDate));
-        dateFormat = new SimpleDateFormat("d/MM/y H:m");
+        dateFormat = new SimpleDateFormat("dd/MM/y HH:mm");
         tvCreatTime.setText(dateFormat.format(curDate));
 
         mNoteItem = new NoteItem();
@@ -105,90 +104,6 @@ public class NewNoteActivity extends BaseActivity {
                 startActivity(intent);
             }
         });
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && null != data) {
-            if(requestCode == REQUEST_CAMERA){
-                //save file to picture note folder
-                Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-
-                FileUtil.createFolder(Define.PICTURE_NOTE_FOLDER);
-
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
-
-                Calendar calendar = Calendar.getInstance();
-                DateFormat dateFormat = new SimpleDateFormat("yMMd_Hms");
-                String fileName = Define.PICTURE_NOTE_FOLDER+"/IMG_"
-                        + dateFormat.format(calendar.getTime()) + "_"
-                        + System.currentTimeMillis() + ".jpg";
-                File destination = new File(fileName);
-                FileOutputStream fo;
-                try {
-                    destination.createNewFile();
-                    fo = new FileOutputStream(destination);
-                    fo.write(bytes.toByteArray());
-                    fo.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                ArrayList<String> tmp = mNoteItem.getPictures();
-                tmp.add(fileName);
-                mNoteItem.setPictures(tmp);
-                gvInsertPicture.setAdapter(new ImageListAdapter(this, mNoteItem.getPictures()));
-            } else if (requestCode == SELECT_FILE){
-                try {
-                    FileUtil.createFolder(Define.PICTURE_NOTE_FOLDER);
-
-                    Uri selectedImage = data.getData();
-                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
-
-                    Cursor cursor = getContentResolver().query(selectedImage,
-                            filePathColumn, null, null, null);
-                    cursor.moveToFirst();
-
-                    int columnIndex = cursor.getColumnIndexOrThrow(filePathColumn[0]);
-                    String picturePath = cursor.getString(columnIndex);
-
-                    // copy file to picture note folder
-                    String fileName = picturePath.substring(picturePath.lastIndexOf("/") + 1);
-                    String newPath = Define.PICTURE_NOTE_FOLDER + "/" + fileName;
-                    FileUtil.copy(new File(picturePath), new File(newPath));
-
-                    ArrayList<String> tmp = mNoteItem.getPictures();
-                    tmp.add(newPath);
-                    mNoteItem.setPictures(tmp);
-                    gvInsertPicture.setAdapter(new ImageListAdapter(this, mNoteItem.getPictures()));
-                    cursor.close();
-                } catch (NullPointerException ne){
-                    ne.printStackTrace();
-                }
-            }
-        }
-    }
-
-    private void getDataToSave(){
-        mNoteItem.setTitle(etTitle.getText().toString());
-        mNoteItem.setNote(etNote.getText().toString());
-        if (tvAlarm.getVisibility() != View.VISIBLE) {
-            String alarmTime = etDate.getText() + " " + etTime.getText() + ":00";
-            mNoteItem.setAlarmTime(alarmTime);
-        }
-        mNoteItem.setCreateTime(tvCreatTime.getText() + ":00");
-    }
-    @Override
-    protected void onResume(){
-        super.onResume();
-        if(mNoteItem.getId() != 0) {
-            getDataToSave();
-            mNoteItem.update(this);
-        }
     }
 
     @Override
@@ -224,7 +139,83 @@ public class NewNoteActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void insertPicture() {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && null != data) {
+            if(requestCode == Define.REQUEST_CAMERA){
+                //save file to picture note folder
+                Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+
+                FileUtil.createFolder(Define.PICTURE_NOTE_FOLDER);
+
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+
+                Calendar calendar = Calendar.getInstance();
+                DateFormat dateFormat = new SimpleDateFormat("yMMd_Hms");
+                String fileName = Define.PICTURE_NOTE_FOLDER+"/IMG_"
+                        + dateFormat.format(calendar.getTime()) + "_"
+                        + System.currentTimeMillis() + ".jpg";
+                File destination = new File(fileName);
+                FileOutputStream fo;
+                try {
+                    destination.createNewFile();
+                    fo = new FileOutputStream(destination);
+                    fo.write(bytes.toByteArray());
+                    fo.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                ArrayList<String> tmp = mNoteItem.getPictures();
+                tmp.add(fileName);
+                mNoteItem.setPictures(tmp);
+                gvInsertPicture.setAdapter(new ImageListAdapter(this, mNoteItem.getPictures()));
+            } else if (requestCode == Define.SELECT_FILE){
+                try {
+                    FileUtil.createFolder(Define.PICTURE_NOTE_FOLDER);
+
+                    Uri selectedImage = data.getData();
+                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
+
+                    Cursor cursor = getContentResolver().query(selectedImage,
+                            filePathColumn, null, null, null);
+                    cursor.moveToFirst();
+
+                    int columnIndex = cursor.getColumnIndexOrThrow(filePathColumn[0]);
+                    String picturePath = cursor.getString(columnIndex);
+
+                    // copy file to picture note folder
+                    String fileName = picturePath.substring(picturePath.lastIndexOf("/") + 1);
+                    String newPath = Define.PICTURE_NOTE_FOLDER + "/" + fileName;
+                    FileUtil.copy(new File(picturePath), new File(newPath));
+
+                    ArrayList<String> tmp = mNoteItem.getPictures();
+                    tmp.add(newPath);
+                    mNoteItem.setPictures(tmp);
+                    gvInsertPicture.setAdapter(new ImageListAdapter(this, mNoteItem.getPictures()));
+                    cursor.close();
+                } catch (NullPointerException ne){
+                    ne.printStackTrace();
+                }
+            }
+        }
+    }
+
+    protected void getDataToSave(){
+        mNoteItem.setTitle(etTitle.getText().toString());
+        mNoteItem.setNote(etNote.getText().toString());
+        if (tvAlarm.getVisibility() != View.VISIBLE) {
+            String alarmTime = etDate.getText() + " " + etTime.getText() + ":00";
+            mNoteItem.setAlarmTime(DateUtil.convertVnToStandarDate(alarmTime));
+        }
+        mNoteItem.setCreateTime(DateUtil.convertVnToStandarDate(tvCreatTime.getText() + ":00"));
+    }
+
+    protected void insertPicture() {
         AlertDialog.Builder builder = new AlertDialog.Builder(NewNoteActivity.this);
         builder.setTitle("Insert Picture");
         builder.setItems(Define.DIALOG_CHOOSE_COLOR_ITEMS, new DialogInterface.OnClickListener() {
@@ -232,13 +223,13 @@ public class NewNoteActivity extends BaseActivity {
             public void onClick(DialogInterface dialog, int item) {
                 if (Define.DIALOG_CHOOSE_COLOR_ITEMS[item].equals("Take Photo")) {
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(intent, REQUEST_CAMERA);
+                    startActivityForResult(intent, Define.REQUEST_CAMERA);
                 } else if (Define.DIALOG_CHOOSE_COLOR_ITEMS[item].equals("Choose Photo")) {
                     Intent intent = new Intent(
                             Intent.ACTION_PICK,
                             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                     intent.setType("image/*");
-                    startActivityForResult(intent, SELECT_FILE);
+                    startActivityForResult(intent, Define.SELECT_FILE);
                 }
             }
         });
@@ -250,7 +241,6 @@ public class NewNoteActivity extends BaseActivity {
         dChooseColor.setTitle("Choose Color");
         dChooseColor.setContentView(R.layout.dialog_choose_color);
         dChooseColor.show();
-//        builder.s
     }
 
     public void tvAlarmOnClick(View v){
@@ -302,16 +292,11 @@ public class NewNoteActivity extends BaseActivity {
         TextView tv = (TextView)v;
         ColorDrawable colorDrawable = (ColorDrawable) tv.getBackground();
         int intColor = colorDrawable.getColor();
-        llMainMew.setBackgroundColor(intColor);
+        llMainNew.setBackgroundColor(intColor);
         // convert color value to color code
         String hexColor = String.format("#%06X", (0xFFFFFF & intColor));
         mNoteItem.setColor(hexColor);
 //        Log.i("Color", Color.parseColor("#ffffff")+"");
         dChooseColor.dismiss();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
     }
 }

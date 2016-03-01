@@ -58,7 +58,25 @@ public class NoteTable {
 
     public void delete(int id){
         SQLiteDatabase db = mDatabaseManager.getWritableDatabase();
-        db.delete(Define.TABLE_NAME, Define.COLUMN_ID+"="+id,null);
+        db.delete(Define.TABLE_NAME, Define.COLUMN_ID + "=" + id, null);
+    }
+
+    public String getOneColumn(String column, int id){
+        SQLiteDatabase db = mDatabaseManager.getReadableDatabase();
+        String value = "";
+        String query = "SELECT "+column+" FROM "+Define.TABLE_NAME+" WHERE "
+                +Define.COLUMN_ID+" = "+id;
+        Cursor cursor = db.rawQuery(query, null);
+        try {
+            if (cursor.moveToFirst()) {
+                value = cursor.getString(cursor.getColumnIndexOrThrow(column));
+            }
+        }catch (NullPointerException npe){
+            npe.printStackTrace();
+        } finally {
+            db.close();
+        }
+        return value;
     }
 
     public NoteItem getOne(int id){

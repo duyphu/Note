@@ -47,7 +47,7 @@ public class ImageListAdapter extends BaseAdapter{
             String path = mListPics.get(position);
             //can chỉnh lại hình cho đẹp
 //            imgView.setLayoutParams(new GridView.LayoutParams(85, 85));
-            imgView.setScaleType(ImageView.ScaleType.FIT_XY);
+            imgView.setScaleType(ImageView.ScaleType.CENTER);
             imgView.setPadding(8, 8, 8, 8);
             imgView.setImageBitmap(BitmapFactory.decodeFile(path));
         } else{
