@@ -62,7 +62,7 @@ public class NotePageFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout containing a title and body text.
         View rootView = inflater
-                .inflate(R.layout.fragment_screen_slide_page, container, false);
+                .inflate(R.layout.fragment_open_note_page, container, false);
         NoteTable noteTable = new NoteTable(getActivity());
         mNoteItem = noteTable.getOne(mNoteId);
 

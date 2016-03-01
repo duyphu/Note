@@ -194,6 +194,7 @@ public class NewNoteActivity extends BaseActivity {
                     FileUtil.copy(new File(picturePath), new File(newPath));
 
                     ArrayList<String> tmp = mNoteItem.getPictures();
+                    Log.i("path", newPath);
                     tmp.add(newPath);
                     mNoteItem.setPictures(tmp);
                     gvInsertPicture.setAdapter(new ImageListAdapter(this, mNoteItem.getPictures()));
