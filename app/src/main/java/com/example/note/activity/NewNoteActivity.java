@@ -150,7 +150,7 @@ public class NewNoteActivity extends BaseActivity {
                 FileUtil.createFolder(Define.PICTURE_NOTE_FOLDER);
 
                 ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                thumbnail.compress(Bitmap.CompressFormat.JPEG, 90, bytes);
+                thumbnail.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
 
                 Calendar calendar = Calendar.getInstance();
                 DateFormat dateFormat = new SimpleDateFormat("yMMd_Hms");
@@ -175,32 +175,12 @@ public class NewNoteActivity extends BaseActivity {
                 mNoteItem.setPictures(tmp);
                 gvInsertPicture.setAdapter(new ImageListAdapter(this, mNoteItem.getPictures()));
             } else if (requestCode == Define.SELECT_FILE){
-                try {
-                    FileUtil.createFolder(Define.PICTURE_NOTE_FOLDER);
-
-                    Uri selectedImage = data.getData();
-                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
-
-                    Cursor cursor = getContentResolver().query(selectedImage,
-                            filePathColumn, null, null, null);
-                    cursor.moveToFirst();
-
-                    int columnIndex = cursor.getColumnIndexOrThrow(filePathColumn[0]);
-                    String picturePath = cursor.getString(columnIndex);
-
-                    // copy file to picture note folder
-                    String fileName = picturePath.substring(picturePath.lastIndexOf("/") + 1);
-                    String newPath = Define.PICTURE_NOTE_FOLDER + "/" + fileName;
-                    FileUtil.copy(new File(picturePath), new File(newPath));
-
+                String newPath = FileUtil.copyPictureToNoteFolder(data, this);
+                if(!newPath.equals("")) {
                     ArrayList<String> tmp = mNoteItem.getPictures();
-                    Log.i("path", newPath);
                     tmp.add(newPath);
                     mNoteItem.setPictures(tmp);
                     gvInsertPicture.setAdapter(new ImageListAdapter(this, mNoteItem.getPictures()));
-                    cursor.close();
-                } catch (NullPointerException ne){
-                    ne.printStackTrace();
                 }
             }
         }

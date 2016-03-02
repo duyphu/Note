@@ -79,6 +79,22 @@ public class NoteTable {
         return value;
     }
 
+    public int getLastId(){
+        int lastId = 0;
+        SQLiteDatabase db = mDatabaseManager.getReadableDatabase();
+        String query = "SELECT "+Define.COLUMN_ID+" FROM "+Define.TABLE_NAME
+                +" ORDER BY "+Define.COLUMN_ID+" DESC LIMIT 1";
+        try {
+            Cursor cursor = db.rawQuery(query, null);
+            if(cursor.moveToFirst()){
+                lastId = cursor.getInt(cursor.getColumnIndexOrThrow(Define.COLUMN_ID));
+            }
+            cursor.close();
+        } catch (NullPointerException npe){
+            npe.printStackTrace();
+        }
+        return lastId;
+    }
     public NoteItem getOne(int id){
         SQLiteDatabase db = mDatabaseManager.getReadableDatabase();
         NoteItem noteItem = new NoteItem();
@@ -97,8 +113,10 @@ public class NoteTable {
                 noteItem.setColor(cursor.getString(cursor.getColumnIndexOrThrow(Define.COLUMN_COLOR)));
                 String pictures =
                         cursor.getString(cursor.getColumnIndexOrThrow(Define.COLUMN_PICTURES));
-                ArrayList<String> list = new ArrayList<String>(Arrays.asList(pictures.split(",")));
-                noteItem.setPictures(list);
+                if (!pictures.equals("")){
+                    ArrayList<String> list = new ArrayList<String>(Arrays.asList(pictures.split(",")));
+                    noteItem.setPictures(list);
+                }
             }
         } catch(NullPointerException npe){
             npe.printStackTrace();

@@ -11,5 +11,9 @@
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
         app:popupTheme="@style/AppTheme.PopupOverlay"/>
-    <include layout="@layout/content_note"/>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <include layout="@layout/content_note"/>
+    </ScrollView>
 </LinearLayout>

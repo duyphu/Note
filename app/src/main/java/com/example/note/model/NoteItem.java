@@ -1,5 +1,6 @@
 package com.example.note.model;
 
+import android.app.AlarmManager;
 import android.content.Context;
 import android.util.Log;
 
@@ -7,7 +8,11 @@ import com.example.note.activity.MainActivity;
 import com.example.note.config.Define;
 import com.example.note.db.table.NoteTable;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -124,6 +129,22 @@ public class NoteItem {
             NoteTable noteTable = new NoteTable(context);
             mTitle = mTitle.equals("") ? ((mNote.equals("") ? Define.DEFAULT_TITLE : mNote)) : mTitle;
             noteTable.insert(convertToHashMap());
+
+            // tao thong bao
+            if(!mAlarmTime.equals("")){
+                //kiem tra alarmtime lon hon hien tai
+                try {
+                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Date date = dateFormat.parse(mAlarmTime);
+                    if(date.getTime() > System.currentTimeMillis()){
+                        //TODO: tao notification
+                        AlarmManager manager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+
+                    }
+                } catch (ParseException pe){
+                    pe.printStackTrace();
+                }
+            }
         }
     }
 

@@ -4,9 +4,10 @@
               android:id="@+id/ll_main_new"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
-    <GridView
+    <com.example.note.custom.view.MyGridView
         android:id="@+id/gv_insert_picture"
         android:numColumns="3"
+        android:layout_margin="@dimen/grid_picture_margin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <LinearLayout
@@ -15,7 +16,7 @@
         android:paddingTop="@dimen/activity_horizontal_margin"
         android:paddingLeft="@dimen/activity_vertical_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
         <TextView
             android:id="@+id/tv_create_time"
             android:layout_width="wrap_content"
@@ -26,6 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/title_hint"
+            android:focusable="false"
             android:layout_marginBottom="@dimen/activity_horizontal_margin"
             android:id="@+id/et_title"/>
         <EditText
@@ -33,6 +35,7 @@
             android:layout_height="wrap_content"
             android:inputType="textMultiLine"
             android:ems="10"
+            android:focusable="false"
             android:hint="@string/note_hint"
             android:layout_marginBottom="@dimen/activity_horizontal_margin"
             android:id="@+id/et_note"

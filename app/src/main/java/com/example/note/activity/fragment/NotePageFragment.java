@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import com.example.note.R;
@@ -37,7 +39,7 @@ public class NotePageFragment extends Fragment {
     private NoteItem mNoteItem;
     protected TextView tvAlarm, tvCreatTime;
     protected EditText etDate ,etTime, etTitle, etNote;
-    protected LinearLayout llSetAlarm, llMainNew;
+    protected LinearLayout llSetAlarm, llMainNew, llContent;
     protected GridView gvInsertPicture;
 
     public static NotePageFragment create(int position, ArrayList<Integer> ids) {
@@ -68,6 +70,7 @@ public class NotePageFragment extends Fragment {
 
         llSetAlarm = (LinearLayout)rootView.findViewById(R.id.ll_set_alarm);
         llMainNew = (LinearLayout)rootView.findViewById(R.id.ll_main_new);
+        llContent = (LinearLayout)rootView.findViewById(R.id.ll_content);
         tvCreatTime = (TextView)rootView.findViewById(R.id.tv_create_time);
         tvAlarm = (TextView)rootView.findViewById(R.id.tv_alarm);
         etDate = (EditText)rootView.findViewById(R.id.et_date);
@@ -76,22 +79,27 @@ public class NotePageFragment extends Fragment {
         etTitle = (EditText)rootView.findViewById(R.id.et_title);
 
         String createTime = DateUtil.convertStandarToVnDate(mNoteItem.getCreateTime());
-        tvCreatTime.setText(createTime.substring(0, createTime.lastIndexOf(":")));
-        String alarmTime = mNoteItem.getAlarmTime();
-        if(!alarmTime.equals("")){
-            tvAlarm.setVisibility(View.GONE);
-            llSetAlarm.setVisibility(View.VISIBLE);
-            alarmTime = DateUtil.convertStandarToVnDate(alarmTime);
-            String [] list = alarmTime.split(" ");
-            etDate.setText(list[0]);
-            etTime.setText(list[1].substring(0, list[1].lastIndexOf(":")));
+        try {
+            tvCreatTime.setText(createTime.substring(0, createTime.lastIndexOf(":")));
+            String alarmTime = mNoteItem.getAlarmTime();
+            if (!alarmTime.equals("")) {
+                tvAlarm.setVisibility(View.GONE);
+                llSetAlarm.setVisibility(View.VISIBLE);
+                alarmTime = DateUtil.convertStandarToVnDate(alarmTime);
+                String[] list = alarmTime.split(" ");
+                etDate.setText(list[0]);
+                etTime.setText(list[1].substring(0, list[1].lastIndexOf(":")));
+            }
+        } catch (Exception e){
+            e.printStackTrace();
         }
         etTitle.setText(mNoteItem.getTitle());
         etNote.setText(mNoteItem.getNote());
 
         llMainNew.setBackgroundColor(Color.parseColor(mNoteItem.getColor()));
+        llContent.setBackgroundColor(Color.parseColor(mNoteItem.getColor()));
         gvInsertPicture = (GridView)rootView.findViewById(R.id.gv_insert_picture);
-        gvInsertPicture.setAdapter(new ImageListAdapter(getActivity(), mNoteItem.getPictures()));
+        new GridLoadAsynTack().execute();
         gvInsertPicture.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -110,8 +118,17 @@ public class NotePageFragment extends Fragment {
         Log.i("Fragment", "onPause");
     }
 
+    public void deletePic(int position){
+        ImageListAdapter adapter = (ImageListAdapter)gvInsertPicture.getAdapter();
+        ArrayList<String> list = adapter.getData();
+        list.remove(position);
+        adapter.notifyDataSetChanged();
+        mNoteItem.setPictures(list);
+    }
+
     public void changeColor(String color){
         llMainNew.setBackgroundColor(Color.parseColor(color));
+        llContent.setBackgroundColor(Color.parseColor(color));
         mNoteItem.setColor(color);
     }
 
@@ -164,11 +181,26 @@ public class NotePageFragment extends Fragment {
         mNoteItem.update(getActivity());
     }
 
-    public NoteItem getNoteItem(){
-        return mNoteItem;
+    public String getTitle(){
+        return etTitle.getText().toString();
     }
 
-    public void setNoteItem(NoteItem noteItem){
-        mNoteItem = noteItem;
+    public String getNote(){
+        return etNote.getText().toString();
+    }
+
+    private class GridLoadAsynTack extends AsyncTask<Void, Void, ImageListAdapter>{
+
+        @Override
+        protected ImageListAdapter doInBackground(Void... params) {
+            new ImageListAdapter(getActivity(), mNoteItem.getPictures());
+            return new ImageListAdapter(getActivity(), mNoteItem.getPictures());
+        }
+
+        @Override
+        protected void onPostExecute(ImageListAdapter imageListAdapter) {
+            super.onPostExecute(imageListAdapter);
+            gvInsertPicture.setAdapter(imageListAdapter);
+        }
     }
 }

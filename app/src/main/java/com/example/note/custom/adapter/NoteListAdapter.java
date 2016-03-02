@@ -64,8 +64,8 @@ public class NoteListAdapter extends ArrayAdapter<NoteItem> {
             ImageView ivAlarm = (ImageView)convertView.findViewById(R.id.iv_alarm);
             ivAlarm.setImageResource(R.drawable.ic_alarm_medium);
         }
-        LinearLayout llContentNote = (LinearLayout)convertView.findViewById(R.id.ll_content_note);
-        llContentNote.setBackgroundColor(Color.parseColor(noteItem.getColor()));
+//        LinearLayout llContentNote = (LinearLayout)convertView.findViewById(R.id.ll_content_note);
+//        llContentNote.setBackgroundColor(Color.parseColor(noteItem.getColor()));
         return convertView;
     }
 }

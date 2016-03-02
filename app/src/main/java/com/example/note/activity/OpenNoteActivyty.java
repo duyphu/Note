@@ -18,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -120,28 +121,9 @@ public class OpenNoteActivyty extends BaseActivity {
 
                 mFragment.insertPicture(fileName);
             } else if (requestCode == Define.SELECT_FILE){
-                try {
-                    FileUtil.createFolder(Define.PICTURE_NOTE_FOLDER);
-
-                    Uri selectedImage = data.getData();
-                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
-
-                    Cursor cursor = getContentResolver().query(selectedImage,
-                            filePathColumn, null, null, null);
-                    cursor.moveToFirst();
-
-                    int columnIndex = cursor.getColumnIndexOrThrow(filePathColumn[0]);
-                    String picturePath = cursor.getString(columnIndex);
-
-                    // copy file to picture note folder
-                    String fileName = picturePath.substring(picturePath.lastIndexOf("/") + 1);
-                    String newPath = Define.PICTURE_NOTE_FOLDER + "/" + fileName;
-                    FileUtil.copy(new File(picturePath), new File(newPath));
-
+                String newPath = FileUtil.copyPictureToNoteFolder(data, this);
+                if(!newPath.equals("")) {
                     mFragment.insertPicture(newPath);
-                    cursor.close();
-                } catch (NullPointerException ne){
-                    ne.printStackTrace();
                 }
             }
         }
@@ -216,6 +198,8 @@ public class OpenNoteActivyty extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+
     protected void insertPicture() {
         AlertDialog.Builder builder = new AlertDialog.Builder(OpenNoteActivyty.this);
         builder.setTitle("Insert Picture");
@@ -235,6 +219,13 @@ public class OpenNoteActivyty extends BaseActivity {
             }
         });
         builder.show();
+    }
+
+    public void ivDeletePicOnClick(View v){
+        ViewGroup viewGroup = (ViewGroup) v.getParent();
+        TextView tvPosition = (TextView)viewGroup.findViewById(R.id.tv_position);
+        int position = Integer.parseInt(tvPosition.getText().toString());
+        mFragment.deletePic(position);
     }
 
     public void chooseColor(){
@@ -311,7 +302,12 @@ public class OpenNoteActivyty extends BaseActivity {
     }
 
     public void ibShareOnClick(View v){
-
+        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        sharingIntent.setType("text/plain");
+        String content = mFragment.getTitle()+"\n"+mFragment.getNote();
+//        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
+        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, content);
+        startActivity(Intent.createChooser(sharingIntent, "Share with"));
     }
 
     public void ibDeleteOnClick(View v){
