@@ -13,9 +13,13 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.method.KeyListener;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,6 +37,7 @@ import com.example.note.config.Define;
 import com.example.note.custom.adapter.ImageListAdapter;
 import com.example.note.model.NoteItem;
 import com.example.note.utils.DateUtil;
+import com.example.note.utils.DialogUtil;
 import com.example.note.utils.FileUtil;
 
 import java.io.ByteArrayOutputStream;
@@ -123,17 +128,23 @@ public class NewNoteActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
-        if (id == R.id.action_insert_picture) {
-            insertPicture();
-        } else if(id == R.id.action_choose_color){
-            chooseColor();
-        } else if(id == R.id.action_done){
-            getDataToSave();
-            mNoteItem.create(this);
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
-            finish();
+        switch (id) {
+            case android.R.id.home:
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+                return true;
+            case R.id.action_insert_picture:
+                insertPicture();
+                return true;
+            case R.id.action_choose_color:
+                chooseColor();
+                return true;
+            case R.id.action_done:
+                getDataToSave();
+                mNoteItem.create(this);
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -184,6 +195,10 @@ public class NewNoteActivity extends BaseActivity {
                 }
             }
         }
+    }
+
+    public void ivDeletePicOnClick(View v){
+        DialogUtil.showDialogConfirmDeletePic(NewNoteActivity.this, v, mNoteItem, gvInsertPicture);
     }
 
     protected void getDataToSave(){

@@ -17,16 +17,19 @@
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/t_main"
+            android:paddingLeft="0dp"
+            android:contentInsetLeft="0dp"
+            app:contentInsetLeft="0dp"
+            android:layout_margin="0dp"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay"/>
+            android:layout_height="@dimen/tool_bar_height"
+            android:background="?attr/colorPrimary"/>
 
     </android.support.design.widget.AppBarLayout>
-    <GridView
+    <com.example.note.custom.view.MyGridView
         android:id="@+id/gv_note_list"
         android:numColumns="@integer/number_column"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    </GridView>
+    </com.example.note.custom.view.MyGridView>
 </LinearLayout>

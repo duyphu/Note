@@ -1,12 +1,15 @@
 package com.example.note.model;
 
 import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import com.example.note.activity.MainActivity;
 import com.example.note.config.Define;
 import com.example.note.db.table.NoteTable;
+import com.example.note.receiver.AlarmReceiver;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -136,10 +139,16 @@ public class NoteItem {
                 try {
                     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                     Date date = dateFormat.parse(mAlarmTime);
+                    int lastId = noteTable.getLastId();
                     if(date.getTime() > System.currentTimeMillis()){
+                        Log.i("Time",date.getTime()+ " "+ System.currentTimeMillis());
                         //TODO: tao notification
                         AlarmManager manager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-
+                        Intent intent = new Intent(context, AlarmReceiver.class);
+                        intent.putExtra("note_id", lastId+1);
+                        intent.putExtra("note_title", mTitle);
+                        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, lastId+1, intent, 0);
+                        manager.set(AlarmManager.RTC_WAKEUP, date.getTime(), pendingIntent);
                     }
                 } catch (ParseException pe){
                     pe.printStackTrace();

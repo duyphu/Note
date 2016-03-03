@@ -29,7 +29,7 @@
                 android:value="com.example.note.activity.MainActivity" />
         </activity>
         <activity
-            android:name=".activity.OpenNoteActivyty"
+            android:name=".activity.OpenNoteActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
             android:uiOptions="splitActionBarWhenNarrow"
@@ -39,6 +39,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.note.activity.MainActivity" />
         </activity>
+        <receiver android:name=".receiver.AlarmReceiver"/>
     </application>
 
 </manifest>

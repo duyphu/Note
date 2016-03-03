@@ -6,19 +6,16 @@ import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.app.NavUtils;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -29,9 +26,9 @@ import com.example.note.R;
 import com.example.note.activity.base.BaseActivity;
 import com.example.note.activity.fragment.NotePageFragment;
 import com.example.note.config.Define;
-import com.example.note.custom.adapter.ImageListAdapter;
 import com.example.note.db.table.NoteTable;
 import com.example.note.custom.adapter.NotePagerAdapter;
+import com.example.note.utils.DialogUtil;
 import com.example.note.utils.FileUtil;
 
 import java.io.ByteArrayOutputStream;
@@ -47,7 +44,7 @@ import java.util.Calendar;
 /**
  * Created by phund on 2/29/2016.
  */
-public class OpenNoteActivyty extends BaseActivity {
+public class OpenNoteActivity extends BaseActivity {
     private ViewPager mPager;
     private NotePagerAdapter mPagerAdapter;
     private Toolbar mToolbarBottom;
@@ -86,6 +83,8 @@ public class OpenNoteActivyty extends BaseActivity {
                 invalidateOptionsMenu();
             }
         });
+        // not show keyboard when activity create
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
 
     @Override
@@ -155,7 +154,7 @@ public class OpenNoteActivyty extends BaseActivity {
         }
         ImageButton ibPrev = (ImageButton)mToolbarBottom.findViewById(R.id.ib_prev);
         ibPrev.setImageResource(resId);
-        setTitle(new NoteTable(OpenNoteActivyty.this)
+        setTitle(new NoteTable(OpenNoteActivity.this)
                 .getOneColumn(Define.COLUMN_TITLE, mIds.get(mPosition)));
         mFragment = (NotePageFragment)mPagerAdapter.getRegisteredFragment(mPosition);
 //        fragment.setTextView("ádasda");
@@ -175,11 +174,10 @@ public class OpenNoteActivyty extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-//            case android.R.id.home:
-////                // Navigate "up" the demo structure to the launchpad activity.
-////                // See http://developer.android.com/design/patterns/navigation.html for more.
-////                NavUtils.navigateUpTo(this, new Intent(this, MainActivity.class));
-//                return true;
+            case android.R.id.home:
+                startActivity(new Intent(this, MainActivity.class));
+                finish();
+                return true;
             case R.id.action_new:
                 startActivity(new Intent(this, NewNoteActivity.class));
                 finish();
@@ -191,6 +189,7 @@ public class OpenNoteActivyty extends BaseActivity {
                 insertPicture();
                 return true;
             case R.id.action_done:
+                startActivity(new Intent(this, MainActivity.class));
                 finish();
                 return true;
         }
@@ -201,7 +200,7 @@ public class OpenNoteActivyty extends BaseActivity {
 
 
     protected void insertPicture() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(OpenNoteActivyty.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(OpenNoteActivity.this);
         builder.setTitle("Insert Picture");
         builder.setItems(Define.DIALOG_CHOOSE_COLOR_ITEMS, new DialogInterface.OnClickListener() {
             @Override
@@ -222,14 +221,11 @@ public class OpenNoteActivyty extends BaseActivity {
     }
 
     public void ivDeletePicOnClick(View v){
-        ViewGroup viewGroup = (ViewGroup) v.getParent();
-        TextView tvPosition = (TextView)viewGroup.findViewById(R.id.tv_position);
-        int position = Integer.parseInt(tvPosition.getText().toString());
-        mFragment.deletePic(position);
+        DialogUtil.showDialogConfirmDeletePic(OpenNoteActivity.this, v, mFragment,null);
     }
 
     public void chooseColor(){
-        dChooseColor = new Dialog(OpenNoteActivyty.this);
+        dChooseColor = new Dialog(OpenNoteActivity.this);
         dChooseColor.setTitle("Choose Color");
         dChooseColor.setContentView(R.layout.dialog_choose_color);
         dChooseColor.show();
@@ -265,7 +261,7 @@ public class OpenNoteActivyty extends BaseActivity {
         String values[] = editTextTime.getText().toString().split(":");
         int hour = Integer.parseInt(values[0]);
         int minute = Integer.parseInt(values[1]);
-        mTimePicker = new TimePickerDialog(OpenNoteActivyty.this, new TimePickerDialog.OnTimeSetListener() {
+        mTimePicker = new TimePickerDialog(OpenNoteActivity.this, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
                 editTextTime.setText(String.format("%02d:%02d", selectedHour, selectedMinute));
@@ -283,7 +279,7 @@ public class OpenNoteActivyty extends BaseActivity {
         int mMonth = Integer.parseInt(values[1]);
         int mYear = Integer.parseInt(values[2]);
 
-        mDatePicker = new DatePickerDialog(OpenNoteActivyty.this, new DatePickerDialog.OnDateSetListener() {
+        mDatePicker = new DatePickerDialog(OpenNoteActivity.this, new DatePickerDialog.OnDateSetListener() {
             public void onDateSet(DatePicker datepicker, int selectedyear, int selectedmonth, int selectedday) {
                 editTextDate.setText(String.format("%02d/%02d/%d", selectedday, selectedmonth,
                         selectedyear));
@@ -311,17 +307,17 @@ public class OpenNoteActivyty extends BaseActivity {
     }
 
     public void ibDeleteOnClick(View v){
-        AlertDialog dialog = new AlertDialog.Builder(OpenNoteActivyty.this).create();
+        AlertDialog dialog = new AlertDialog.Builder(OpenNoteActivity.this).create();
         dialog.setTitle("Confirm Delete");
         dialog.setMessage("Are you sure you want to delete this?");
         dialog.setCancelable(false);
         dialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int buttonId) {
-                        NoteTable noteTable = new NoteTable(OpenNoteActivyty.this);
+                        NoteTable noteTable = new NoteTable(OpenNoteActivity.this);
                         noteTable.delete(mIds.get(mPosition));
                         dialog.dismiss();
-                        startActivity(new Intent(OpenNoteActivyty.this, MainActivity.class));
+                        startActivity(new Intent(OpenNoteActivity.this, MainActivity.class));
                         finish();
                     }
                 });

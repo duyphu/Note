@@ -49,4 +49,6 @@ public class Define {
 
     public static int REQUEST_CAMERA = 1;
     public static int SELECT_FILE = 2;
+
+    public static String NOTIFICATION_TITLE = "Note notification";
 }

@@ -1,6 +1,7 @@
 package com.example.note.activity;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -49,10 +50,11 @@ public class MainActivity extends BaseActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 NoteItem item = list.get(position);
                 int noteId = item.getId();
-                Intent intent = new Intent(MainActivity.this, OpenNoteActivyty.class);
+                Intent intent = new Intent(MainActivity.this, OpenNoteActivity.class);
                 intent.putExtra("noteId", noteId);
                 intent.putExtra("listId", mIds);
                 startActivity(intent);
+                finish();
             }
         });
 
@@ -82,8 +84,14 @@ public class MainActivity extends BaseActivity {
         if (id == R.id.action_add) {
             Intent intent = new Intent(MainActivity.this, NewNoteActivity.class);
             startActivity(intent);
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 }

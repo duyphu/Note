@@ -7,7 +7,7 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/t_new_note"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="@dimen/tool_bar_height"
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
         app:popupTheme="@style/AppTheme.PopupOverlay"/>
