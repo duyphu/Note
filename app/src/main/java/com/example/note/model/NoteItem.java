@@ -50,6 +50,17 @@ public class NoteItem {
         mPictures = list;
     }
 
+    //contructor copy
+    public NoteItem(NoteItem noteItem){
+        mId = noteItem.mId;
+        mTitle = noteItem.mTitle;
+        mNote = noteItem.mNote;
+        mCreateTime = noteItem.mCreateTime;
+        mAlarmTime = noteItem.mAlarmTime;
+        mColor = noteItem.mColor;
+        mPictures = new ArrayList<String>(noteItem.getPictures());
+    }
+
     public String getCreateTime() {
         return mCreateTime;
     }
@@ -134,32 +145,37 @@ public class NoteItem {
             noteTable.insert(convertToHashMap());
 
             // tao thong bao
-            if(!mAlarmTime.equals("")){
-                //kiem tra alarmtime lon hon hien tai
-                try {
-                    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    Date date = dateFormat.parse(mAlarmTime);
-                    int lastId = noteTable.getLastId();
-                    if(date.getTime() > System.currentTimeMillis()){
-                        Log.i("Time",date.getTime()+ " "+ System.currentTimeMillis());
-                        //TODO: tao notification
-                        AlarmManager manager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-                        Intent intent = new Intent(context, AlarmReceiver.class);
-                        intent.putExtra("note_id", lastId+1);
-                        intent.putExtra("note_title", mTitle);
-                        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, lastId+1, intent, 0);
-                        manager.set(AlarmManager.RTC_WAKEUP, date.getTime(), pendingIntent);
-                    }
-                } catch (ParseException pe){
-                    pe.printStackTrace();
-                }
-            }
+            int lastId = noteTable.getLastId();
+            Log.i("lastId", lastId+"");
+            createNotification(context, lastId);
         }
     }
 
     public void update(Context context){
         NoteTable noteTable = new NoteTable(context);
         noteTable.update(convertToHashMap(), mId + "");
+        createNotification(context, mId);
+    }
+
+    public void createNotification(Context context, int id){
+        if(!mAlarmTime.equals("")){
+            //kiem tra alarmtime lon hon hien tai
+            try {
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date date = dateFormat.parse(mAlarmTime);
+                if(date.getTime() > System.currentTimeMillis()){
+                    //TODO: tao notification
+                    AlarmManager manager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+                    Intent intent = new Intent(context, AlarmReceiver.class);
+                    intent.putExtra("note_id", id);
+                    intent.putExtra("note_title", mTitle);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(context, id, intent, 0);
+                    manager.set(AlarmManager.RTC_WAKEUP, date.getTime(), pendingIntent);
+                }
+            } catch (ParseException pe){
+                pe.printStackTrace();
+            }
+        }
     }
 
     public String toString(){

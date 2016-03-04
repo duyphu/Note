@@ -6,20 +6,16 @@ import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Configuration;
-import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Shader;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.method.KeyListener;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +24,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -35,6 +32,8 @@ import com.example.note.R;
 import com.example.note.activity.base.BaseActivity;
 import com.example.note.config.Define;
 import com.example.note.custom.adapter.ImageListAdapter;
+import com.example.note.custom.adapter.ItemDialogAdapter;
+import com.example.note.model.DialogItem;
 import com.example.note.model.NoteItem;
 import com.example.note.utils.DateUtil;
 import com.example.note.utils.DialogUtil;
@@ -69,6 +68,11 @@ public class NewNoteActivity extends BaseActivity {
         setContentView(R.layout.activity_new_note);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.t_new_note);
+        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.ic_toolbar);
+        BitmapDrawable bitmapDrawable = new BitmapDrawable(bmp);
+        bitmapDrawable.setTileModeXY(Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+        toolbar.setBackgroundDrawable(bitmapDrawable);
+
         setSupportActionBar(toolbar);
 
         ActionBar actionBar = getSupportActionBar();
@@ -214,7 +218,10 @@ public class NewNoteActivity extends BaseActivity {
     protected void insertPicture() {
         AlertDialog.Builder builder = new AlertDialog.Builder(NewNoteActivity.this);
         builder.setTitle("Insert Picture");
-        builder.setItems(Define.DIALOG_CHOOSE_COLOR_ITEMS, new DialogInterface.OnClickListener() {
+        ListAdapter adapter = new ItemDialogAdapter(NewNoteActivity.this,
+                android.R.layout.select_dialog_item, Define.ITEMS_INSERT_PIC_DIALOG);
+        builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+
             @Override
             public void onClick(DialogInterface dialog, int item) {
                 if (Define.DIALOG_CHOOSE_COLOR_ITEMS[item].equals("Take Photo")) {

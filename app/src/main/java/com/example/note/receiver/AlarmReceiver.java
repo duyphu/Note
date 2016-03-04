@@ -35,6 +35,7 @@ public class AlarmReceiver extends BroadcastReceiver{
                 .setContentText(title)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
+                .setTicker(Define.NOTIFICATION_TITLE)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
                 .build();
         notificationManager.notify(id,notification);

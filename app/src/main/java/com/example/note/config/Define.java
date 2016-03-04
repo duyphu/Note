@@ -2,6 +2,9 @@ package com.example.note.config;
 
 import android.os.Environment;
 
+import com.example.note.R;
+import com.example.note.model.DialogItem;
+
 /**
  * Created by phund on 2/24/2016.
  */
@@ -51,4 +54,8 @@ public class Define {
     public static int SELECT_FILE = 2;
 
     public static String NOTIFICATION_TITLE = "Note notification";
+    public static final DialogItem[] ITEMS_INSERT_PIC_DIALOG = {
+            new DialogItem("Take Photo", R.drawable.ic_camera_gray),
+            new DialogItem("Choose Photo", R.drawable.ic_image)
+    };
 }

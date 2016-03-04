@@ -24,6 +24,7 @@ import com.example.note.db.table.NoteTable;
 import com.example.note.model.NoteItem;
 import com.example.note.utils.DateUtil;
 
+import java.security.acl.LastOwnerException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -112,12 +113,6 @@ public class NotePageFragment extends Fragment {
         return rootView;
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        Log.i("Fragment", "onPause");
-    }
-
     public void deletePic(int position){
         ImageListAdapter adapter = (ImageListAdapter)gvInsertPicture.getAdapter();
         ArrayList<String> list = adapter.getData();
@@ -138,6 +133,10 @@ public class NotePageFragment extends Fragment {
         list.add(path);
         mNoteItem.setPictures(list);
         gvInsertPicture.setAdapter(new ImageListAdapter(getActivity(), mNoteItem.getPictures()));
+    }
+
+    public NoteItem getNoteItem(){
+        return  mNoteItem;
     }
 
     public int getVisibilityTVAlarm(){
@@ -164,21 +163,34 @@ public class NotePageFragment extends Fragment {
         etTime.setText(Define.DEFAULT_TIME);
     }
 
-    public void saveData(){
+    public void saveData(NoteItem lastNoteItem){
         String title = etTitle.getText().toString();
         String note = etNote.getText().toString();
         if(title.equals("")){
             if(!note.equals("")) title = note;
         }
+        mNoteItem.setAlarmTime(getAlarmTime());
         mNoteItem.setTitle(title);
         mNoteItem.setNote(note);
+
+        // kiem tra co thay doi
+        Log.i("NoteItem 1", lastNoteItem.toString());
+        Log.i("NoteItem 2", mNoteItem.toString());
+        if(!lastNoteItem.toString().equals(mNoteItem.toString())) {
+            // update create time
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            mNoteItem.setCreateTime(dateFormat.format(Calendar.getInstance().getTime()));
+            mNoteItem.update(getActivity());
+        }
+    }
+
+    public String getAlarmTime(){
         String alarmTime = "";
         if(tvAlarm.getVisibility() != View.VISIBLE){
             alarmTime = etDate.getText() + " " + etTime.getText() + ":00";
             alarmTime = DateUtil.convertVnToStandarDate(alarmTime);
         }
-        mNoteItem.setAlarmTime(alarmTime);
-        mNoteItem.update(getActivity());
+        return alarmTime;
     }
 
     public String getTitle(){

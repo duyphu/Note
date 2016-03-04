@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +20,7 @@ import android.view.WindowManager;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -26,8 +28,10 @@ import com.example.note.R;
 import com.example.note.activity.base.BaseActivity;
 import com.example.note.activity.fragment.NotePageFragment;
 import com.example.note.config.Define;
+import com.example.note.custom.adapter.ItemDialogAdapter;
 import com.example.note.db.table.NoteTable;
 import com.example.note.custom.adapter.NotePagerAdapter;
+import com.example.note.model.NoteItem;
 import com.example.note.utils.DialogUtil;
 import com.example.note.utils.FileUtil;
 
@@ -50,8 +54,10 @@ public class OpenNoteActivity extends BaseActivity {
     private Toolbar mToolbarBottom;
     private int mPosition;
     private ArrayList<Integer> mIds;
-    protected Dialog dChooseColor;
-    protected NotePageFragment mFragment;
+    private Dialog dChooseColor;
+    private NotePageFragment mFragment;
+    private NoteItem mNoteItem;
+    private static final String TAG = "OpenNoteActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,13 +84,14 @@ public class OpenNoteActivity extends BaseActivity {
         mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                mFragment.saveData();
+                mFragment.saveData(mNoteItem);
                 mPosition = position;
                 invalidateOptionsMenu();
             }
         });
         // not show keyboard when activity create
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        Log.i("OpenNoteActivity", "Oncreate");
     }
 
     @Override
@@ -131,7 +138,7 @@ public class OpenNoteActivity extends BaseActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        mFragment.saveData();
+        mFragment.saveData(mNoteItem);
     }
 
     @Override
@@ -157,6 +164,10 @@ public class OpenNoteActivity extends BaseActivity {
         setTitle(new NoteTable(OpenNoteActivity.this)
                 .getOneColumn(Define.COLUMN_TITLE, mIds.get(mPosition)));
         mFragment = (NotePageFragment)mPagerAdapter.getRegisteredFragment(mPosition);
+
+        Log.i(TAG, "gan gia tri cho noteitem");
+        mNoteItem = new NoteItem(mFragment.getNoteItem());
+
 //        fragment.setTextView("ádasda");
 //        menu.findItem(R.id.action_previous).setEnabled(mPager.getCurrentItem() > 0);
 //
@@ -200,9 +211,12 @@ public class OpenNoteActivity extends BaseActivity {
 
 
     protected void insertPicture() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(OpenNoteActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Insert Picture");
-        builder.setItems(Define.DIALOG_CHOOSE_COLOR_ITEMS, new DialogInterface.OnClickListener() {
+        ListAdapter adapter = new ItemDialogAdapter(this,
+                android.R.layout.select_dialog_item, Define.ITEMS_INSERT_PIC_DIALOG);
+        builder.setAdapter(adapter, new DialogInterface.OnClickListener() {
+
             @Override
             public void onClick(DialogInterface dialog, int item) {
                 if (Define.DIALOG_CHOOSE_COLOR_ITEMS[item].equals("Take Photo")) {

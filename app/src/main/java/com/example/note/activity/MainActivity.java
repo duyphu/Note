@@ -2,6 +2,10 @@ package com.example.note.activity;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Shader;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -11,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import com.example.note.R;
 import com.example.note.activity.base.BaseActivity;
@@ -29,8 +34,25 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        int openNoteId = getIntent().getIntExtra("note_id", 0);
+        if(openNoteId != 0){
+            mIds = new ArrayList<Integer>();
+            mIds.add(openNoteId);
+            Intent intent = new Intent(MainActivity.this, OpenNoteActivity.class);
+            intent.putExtra("noteId", openNoteId);
+            intent.putExtra("listId", mIds);
+            startActivity(intent);
+            finish();
+        }
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.t_main);
         setSupportActionBar(toolbar);
+        Bitmap bmp = BitmapFactory.decodeResource(getResources(), R.drawable.ic_toolbar);
+        BitmapDrawable bitmapDrawable = new BitmapDrawable(bmp);
+        bitmapDrawable.setTileModeXY(Shader.TileMode.REPEAT, Shader.TileMode.REPEAT);
+        toolbar.setBackgroundDrawable(bitmapDrawable);
+
+        TextView tvNoNotes = (TextView) findViewById(R.id.tv_no_notes);
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setLogo(R.mipmap.notes);
@@ -42,6 +64,7 @@ public class MainActivity extends BaseActivity {
         for (int i = 0; i < list.size(); i++) {
             mIds.add(list.get(i).getId());
         }
+        if(!mIds.isEmpty()) tvNoNotes.setVisibility(View.GONE);
         gvNoteList = (GridView)findViewById(R.id.gv_note_list);
         NoteListAdapter adapter = new NoteListAdapter(this, R.layout.item_grid_note, list);
         gvNoteList.setAdapter(adapter);
@@ -58,7 +81,7 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        Log.i("MainActivity", " onCreat");
+        Log.i("MainActivity", " onCreate");
     }
 
     protected void onResume(){

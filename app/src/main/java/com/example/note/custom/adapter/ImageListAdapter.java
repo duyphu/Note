@@ -29,7 +29,6 @@ public class ImageListAdapter extends BaseAdapter{
     public ImageListAdapter(Context context, ArrayList<String> list){
         mContext = context;
         mListPics = list;
-        Log.i("List Pic", list.toString());
     }
 
     public ArrayList<String> getData(){

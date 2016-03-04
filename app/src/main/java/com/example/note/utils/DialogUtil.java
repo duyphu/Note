@@ -1,18 +1,24 @@
 package com.example.note.utils;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.provider.MediaStore;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import com.example.note.R;
 import com.example.note.activity.NewNoteActivity;
 import com.example.note.activity.OpenNoteActivity;
 import com.example.note.activity.fragment.NotePageFragment;
+import com.example.note.config.Define;
 import com.example.note.custom.adapter.ImageListAdapter;
+import com.example.note.custom.adapter.ItemDialogAdapter;
 import com.example.note.model.NoteItem;
 
 import java.util.ArrayList;
