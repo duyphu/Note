@@ -14,4 +14,5 @@
 
     <color name="colorBackgroundMain">#DDDDDD</color>
     <color name="colorLine">#555555</color>
+    <color name="colorPopupSpinner">#F3F3F3</color>
 </resources>

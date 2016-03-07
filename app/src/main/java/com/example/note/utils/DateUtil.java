@@ -5,6 +5,7 @@ import android.util.Log;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -35,5 +36,23 @@ public class DateUtil {
             pe.printStackTrace();
         }
         return newDate;
+    }
+
+    public static String convertStringToDate(String date){
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date d = new Date();
+        String dayOfTheWeek = sdf.format(d);
+        if(date.equals("Today")){
+            return sdf.format(d);
+        } else if(date.equals("Tomorrow")){
+            Calendar c = Calendar.getInstance();
+            c.add(Calendar.DAY_OF_YEAR, 1);
+            return sdf.format(c.getTime());
+        } else if(date.contains("Next")){
+            Calendar c = Calendar.getInstance();
+            c.add(Calendar.DAY_OF_YEAR, 7);
+            return sdf.format(c.getTime());
+        }
+        return date;
     }
 }

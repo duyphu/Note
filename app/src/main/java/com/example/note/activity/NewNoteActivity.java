@@ -16,15 +16,18 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -47,6 +50,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -55,12 +59,15 @@ import java.util.Date;
  */
 public class NewNoteActivity extends BaseActivity {
     protected LinearLayout llSetAlarm;
-    protected LinearLayout llMainNew;
+    protected LinearLayout llMainNew, LLParentNew;
     protected TextView tvAlarm, tvCreatTime;
-    protected EditText etDate ,etTime, etTitle, etNote;
+    protected EditText etTitle, etNote;
+    protected Spinner sAlarmDate, sAlarmTime;
     protected GridView gvInsertPicture;
     protected Dialog dChooseColor;
     protected NoteItem mNoteItem;
+    protected static ArrayList<String> mTimeAlarms, mDateAlams;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -82,23 +89,95 @@ public class NewNoteActivity extends BaseActivity {
 
         llSetAlarm = (LinearLayout)findViewById(R.id.ll_set_alarm);
         llMainNew = (LinearLayout)findViewById(R.id.ll_main_new);
+        LLParentNew = (LinearLayout)findViewById(R.id.ll_parent_new);
         tvAlarm = (TextView)findViewById(R.id.tv_alarm);
         tvCreatTime = (TextView)findViewById(R.id.tv_create_time);
         etTitle = (EditText)findViewById(R.id.et_title);
         etNote = (EditText)findViewById(R.id.et_note);
-        etDate = (EditText)findViewById(R.id.et_date);
-        etTime = (EditText)findViewById(R.id.et_time);
-        etDate.setKeyListener(null);
-        etTime.setKeyListener(null);
+        sAlarmDate = (Spinner)findViewById(R.id.s_alarm_date);
+        sAlarmTime = (Spinner)findViewById(R.id.s_alarm_time);
 
-        // set default date and time
-        etTime.setText(Define.DEFAULT_TIME);
-        Calendar calendar = Calendar.getInstance();
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/y");
-        Date curDate = calendar.getTime();
-        etDate.setText(dateFormat.format(curDate));
-        dateFormat = new SimpleDateFormat("dd/MM/y HH:mm");
-        tvCreatTime.setText(dateFormat.format(curDate));
+
+        mDateAlams = new ArrayList<String>();
+        mDateAlams.add("Today");
+        mDateAlams.add("Tomorrow");
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
+        Date d = new Date();
+        String dayOfTheWeek = sdf.format(d);
+        mDateAlams.add("Next "+dayOfTheWeek);
+        mDateAlams.add("Other");
+        final ArrayAdapter<String> dateAdapter = new ArrayAdapter<String>(this
+                , android.R.layout.simple_spinner_item, mDateAlams);
+        dateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sAlarmDate.setAdapter(dateAdapter);
+        sAlarmDate.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, final int position, long id) {
+                if(mDateAlams.get(position).equals("Other")) {
+                    DatePickerDialog mDatePicker;
+                    Calendar c = Calendar.getInstance();
+                    int mDay = c.get(Calendar.DAY_OF_MONTH);
+                    int mMonth = c.get(Calendar.MONTH);
+                    int mYear = c.get(Calendar.YEAR);
+
+                    mDatePicker = new DatePickerDialog(NewNoteActivity.this
+                            , new DatePickerDialog.OnDateSetListener() {
+                        public void onDateSet(DatePicker datepicker
+                                , int selectedyear, int selectedmonth, int selectedday) {
+                            mDateAlams.set(position, String.format("%02d/%02d/%d"
+                                    , selectedday, selectedmonth, selectedyear));
+
+                            if (mDateAlams.indexOf("Other") < 0) mDateAlams.add("Other");
+                            dateAdapter.notifyDataSetChanged();
+                        }
+                    }, mYear, mMonth, mDay);
+                    mDatePicker.setTitle("Select Date");
+                    mDatePicker.show();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        String tmp [] = {"09:00","13:00","17:00","20:00","Other"};
+        mTimeAlarms = new ArrayList<String>(Arrays.asList(tmp));
+        final ArrayAdapter<String> timeAdapter = new ArrayAdapter<String>(this
+                , android.R.layout.simple_spinner_item, mTimeAlarms);
+        timeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sAlarmTime.setAdapter(timeAdapter);
+        sAlarmTime.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, final int position, long id) {
+                if(mTimeAlarms.get(position).equals("Other")){
+                    TimePickerDialog mTimePicker;
+                    Calendar c = Calendar.getInstance();
+                    int hour = c.get(Calendar.HOUR_OF_DAY)+1;
+                    int minute = 0;
+                    mTimePicker = new TimePickerDialog(NewNoteActivity.this, new TimePickerDialog.OnTimeSetListener() {
+
+                        @Override
+                        public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                            mTimeAlarms.set(position, String.format("%02d:%02d", selectedHour,
+                                    selectedMinute));
+                            if(mTimeAlarms.indexOf("Other") < 0) mTimeAlarms.add("Other");
+                            timeAdapter.notifyDataSetChanged();
+                        }
+                    }, hour, minute, true);//Yes 24 hour time
+                    mTimePicker.setTitle("Select Time");
+                    mTimePicker.show();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
 
         mNoteItem = new NoteItem();
         gvInsertPicture = (GridView)findViewById(R.id.gv_insert_picture);
@@ -209,7 +288,9 @@ public class NewNoteActivity extends BaseActivity {
         mNoteItem.setTitle(etTitle.getText().toString());
         mNoteItem.setNote(etNote.getText().toString());
         if (tvAlarm.getVisibility() != View.VISIBLE) {
-            String alarmTime = etDate.getText() + " " + etTime.getText() + ":00";
+            String date = sAlarmDate.getSelectedItem().toString();
+            String alarmTime = DateUtil.convertStringToDate(date) + " "
+                    + sAlarmTime.getSelectedItem().toString() + ":00";
             mNoteItem.setAlarmTime(DateUtil.convertVnToStandarDate(alarmTime));
         }
         mNoteItem.setCreateTime(DateUtil.convertVnToStandarDate(tvCreatTime.getText() + ":00"));
@@ -258,44 +339,12 @@ public class NewNoteActivity extends BaseActivity {
         tvAlarm.setVisibility(View.VISIBLE);
     }
 
-    public void etTimeOnClick(View v){
-        TimePickerDialog mTimePicker;
-        final EditText editTextTime = (EditText)v;
-        String values[] = editTextTime.getText().toString().split(":");
-        int hour = Integer.parseInt(values[0]);
-        int minute = Integer.parseInt(values[1]);
-        mTimePicker = new TimePickerDialog(NewNoteActivity.this, new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
-                editTextTime.setText(String.format("%02d:%02d", selectedHour, selectedMinute));
-            }
-        }, hour, minute, true);//Yes 24 hour time
-        mTimePicker.setTitle("Select Time");
-        mTimePicker.show();
-    }
-
-    public void etDateOnClick(View v){
-        DatePickerDialog mDatePicker;
-        final EditText editTextDate = (EditText)v;
-        String values[] = editTextDate.getText().toString().split("/");
-        int mDay = Integer.parseInt(values[0]);
-        int mMonth = Integer.parseInt(values[1]);
-        int mYear = Integer.parseInt(values[2]);
-
-        mDatePicker = new DatePickerDialog(NewNoteActivity.this, new DatePickerDialog.OnDateSetListener() {
-            public void onDateSet(DatePicker datepicker, int selectedyear, int selectedmonth, int selectedday) {
-                editTextDate.setText(String.format("%02d/%02d/%d", selectedday, selectedmonth,selectedyear));
-            }
-        }, mYear, mMonth, mDay);
-        mDatePicker.setTitle("Select Date");
-        mDatePicker.show();
-    }
-
     public void tvColorOnClick(View v){
         TextView tv = (TextView)v;
         ColorDrawable colorDrawable = (ColorDrawable) tv.getBackground();
         int intColor = colorDrawable.getColor();
         llMainNew.setBackgroundColor(intColor);
+        LLParentNew.setBackgroundColor(intColor);
         // convert color value to color code
         String hexColor = String.format("#%06X", (0xFFFFFF & intColor));
         mNoteItem.setColor(hexColor);

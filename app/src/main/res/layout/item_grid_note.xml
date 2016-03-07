@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.example.note.custom.layout.MyLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.example.note.custom.layout.SquareLinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
+
     <LinearLayout
         android:id="@+id/ll_content_note"
         android:layout_width="match_parent"
@@ -10,9 +11,11 @@
         android:layout_margin="@dimen/item_grid_note_margin"
         android:padding="@dimen/text_padding"
         android:layout_height="match_parent">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <TextView
                 android:id="@+id/tv_title"
                 android:maxLines="@integer/title_line_number"
@@ -22,19 +25,23 @@
                 android:layout_width="wrap_content"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"/>
+
             <ImageView
                 android:id="@+id/iv_alarm"
                 android:padding="@dimen/text_padding"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="@color/colorLine"/>
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
+
             <TextView
                 android:padding="@dimen/text_padding"
                 android:layout_width="match_parent"
@@ -42,6 +49,7 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:maxLines="@integer/note_line_number"
                 android:id="@+id/tv_note"/>
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -50,8 +58,9 @@
                 android:padding="@dimen/text_padding"
                 android:textSize="@dimen/create_date_size"
                 android:id="@+id/tv_create_time"/>
+
         </RelativeLayout>
 
     </LinearLayout>
 
-</com.example.note.custom.layout.MyLayout>
+</com.example.note.custom.layout.SquareLinearLayout>

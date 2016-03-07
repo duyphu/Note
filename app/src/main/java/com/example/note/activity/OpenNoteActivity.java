@@ -74,6 +74,7 @@ public class OpenNoteActivity extends BaseActivity {
         mToolbarBottom = (Toolbar) findViewById(R.id.t_bottom_note);
 
         int noteId = getIntent().getIntExtra("noteId", 0);
+        Log.i(TAG, "note id "+noteId);
         mIds = getIntent().getIntegerArrayListExtra("listId");
         mPosition  = mIds.indexOf(noteId);
 
@@ -258,7 +259,6 @@ public class OpenNoteActivity extends BaseActivity {
     public void tvAlarmOnClick(View v){
         if(mFragment.getVisibilityLLSetAlarm() != View.VISIBLE){
             //TODO: Khoi tao gia tri cho alarm
-            mFragment.initAlarm();
             mFragment.setVisibilityLLSetAlarm(View.VISIBLE);
             v.setVisibility(View.GONE);
         }

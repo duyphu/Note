@@ -11,12 +11,12 @@ import android.widget.EditText;
 /**
  * Created by phund on 3/3/2016.
  */
-public class MyEditText extends EditText {
+public class UnderLineEditText extends EditText {
 
     private Rect mRect;
     private Paint mPaint;
 
-    public MyEditText(Context context, AttributeSet attrs) {
+    public UnderLineEditText(Context context, AttributeSet attrs) {
         super(context, attrs);
         mRect = new Rect();
         mPaint = new Paint();

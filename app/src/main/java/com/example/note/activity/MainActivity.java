@@ -35,6 +35,7 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
 
         int openNoteId = getIntent().getIntExtra("note_id", 0);
+        Log.i("MainActivity", openNoteId+"");
         if(openNoteId != 0){
             mIds = new ArrayList<Integer>();
             mIds.add(openNoteId);
@@ -81,7 +82,6 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        Log.i("MainActivity", " onCreate");
     }
 
     protected void onResume(){

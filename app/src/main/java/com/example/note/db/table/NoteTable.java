@@ -29,30 +29,32 @@ public class NoteTable {
         mDatabaseManager = new DatabaseManager(context);
     }
 
-    public void insert(HashMap<String, String> hashMap){
+    public void insert(NoteItem item){
         SQLiteDatabase db = mDatabaseManager.getWritableDatabase();
-        Set set = hashMap.entrySet();
-        Iterator iterator = set.iterator();
         ContentValues contentValues = new ContentValues();
-        while (iterator.hasNext()){
-            Map.Entry mentry = (Map.Entry) iterator.next();
-            contentValues.put(mentry.getKey().toString(), mentry.getValue().toString());
-        }
+        contentValues.put(Define.COLUMN_ALARM_TIME, item.getAlarmTime());
+        contentValues.put(Define.COLUMN_CREATE_TIME, item.getCreateTime());
+        contentValues.put(Define.COLUMN_COLOR, item.getColor());
+        contentValues.put(Define.COLUMN_PICTURES, item.getPictures()
+                .toString().replaceAll("\\s+|\\[|\\]", ""));
+        contentValues.put(Define.COLUMN_NOTE, item.getNote());
+        contentValues.put(Define.COLUMN_TITLE, item.getTitle());
         db.insert(Define.TABLE_NAME, null, contentValues);
         db.close();
 
     }
 
-    public void update(HashMap<String, String> hashMap, String id){
+    public void update(NoteItem item){
         SQLiteDatabase db = mDatabaseManager.getWritableDatabase();
-        Set set = hashMap.entrySet();
-        Iterator iterator = set.iterator();
         ContentValues contentValues = new ContentValues();
-        while (iterator.hasNext()){
-            Map.Entry mentry = (Map.Entry) iterator.next();
-            contentValues.put(mentry.getKey().toString(), mentry.getValue().toString());
-        }
-        db.update(Define.TABLE_NAME, contentValues, Define.COLUMN_ID + "=" + id, null);
+        contentValues.put(Define.COLUMN_ALARM_TIME, item.getAlarmTime());
+        contentValues.put(Define.COLUMN_CREATE_TIME, item.getCreateTime());
+        contentValues.put(Define.COLUMN_COLOR, item.getColor());
+        contentValues.put(Define.COLUMN_PICTURES, item.getPictures()
+                .toString().replaceAll("\\s+|\\[|\\]", ""));
+        contentValues.put(Define.COLUMN_NOTE, item.getNote());
+        contentValues.put(Define.COLUMN_TITLE, item.getTitle());
+        db.update(Define.TABLE_NAME, contentValues, Define.COLUMN_ID + "=" + item.getId(), null);
         db.close();
     }
 

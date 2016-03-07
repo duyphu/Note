@@ -2,23 +2,21 @@ package com.example.note.custom.layout;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.RelativeLayout;
-
-import java.util.ResourceBundle;
+import android.widget.LinearLayout;
 
 /**
  * Created by phund on 3/3/2016.
  */
-public class MyRelativeLayout extends RelativeLayout {
-    public MyRelativeLayout(Context context) {
+public class SquareLinearLayout extends LinearLayout {
+    public SquareLinearLayout(Context context) {
         super(context);
     }
 
-    public MyRelativeLayout(Context context, AttributeSet attrs) {
+    public SquareLinearLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public MyRelativeLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+    public SquareLinearLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
