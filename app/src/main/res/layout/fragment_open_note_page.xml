@@ -18,9 +18,13 @@
     android:id="@+id/ll_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <include layout="@layout/content_note"/>
+
     </ScrollView>
+
 </LinearLayout>

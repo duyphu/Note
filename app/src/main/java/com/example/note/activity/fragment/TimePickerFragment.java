@@ -36,8 +36,8 @@ public class TimePickerFragment extends DialogFragment
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         Log.i("time >>>>>>>>>>>", view.getParent().toString());
         ViewGroup viewGroup = (ViewGroup)view.getParent().getParent();
-        EditText editText = (EditText)viewGroup.findViewById(R.id.et_time);
+//        EditText editText = (EditText)viewGroup.findViewById(R.id.et_time);
         String time = String.format("%2d:%2d", hourOfDay, minute);
-        editText.setText(time);
+//        editText.setText(time);
     }
 }

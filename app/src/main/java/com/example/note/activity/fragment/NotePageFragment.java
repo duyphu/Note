@@ -1,6 +1,8 @@
 package com.example.note.activity.fragment;
 
+import android.app.DatePickerDialog;
 import android.app.Fragment;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
@@ -11,11 +13,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import com.example.note.R;
 import com.example.note.config.Define;
@@ -28,7 +34,9 @@ import java.security.acl.LastOwnerException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by phund on 2/29/2016.
@@ -39,9 +47,11 @@ public class NotePageFragment extends Fragment {
     private int mNoteId;
     private NoteItem mNoteItem;
     protected TextView tvAlarm, tvCreatTime;
-    protected EditText etDate ,etTime, etTitle, etNote;
+    protected EditText etTitle, etNote;
+    protected Spinner sAlarmDate, sAlarmTime;
     protected LinearLayout llSetAlarm, llMainNew, llContent;
     protected GridView gvInsertPicture;
+    protected ArrayList<String> mDateAlams,mTimeAlarms;
 
     public static NotePageFragment create(int position, ArrayList<Integer> ids) {
         NotePageFragment fragment = new NotePageFragment();
@@ -74,10 +84,90 @@ public class NotePageFragment extends Fragment {
         llContent = (LinearLayout)rootView.findViewById(R.id.ll_content);
         tvCreatTime = (TextView)rootView.findViewById(R.id.tv_create_time);
         tvAlarm = (TextView)rootView.findViewById(R.id.tv_alarm);
-        etDate = (EditText)rootView.findViewById(R.id.et_date);
-        etTime = (EditText)rootView.findViewById(R.id.et_time);
+        sAlarmDate = (Spinner)rootView.findViewById(R.id.s_alarm_date);
+        sAlarmTime = (Spinner)rootView.findViewById(R.id.s_alarm_time);
         etNote = (EditText)rootView.findViewById(R.id.et_note);
         etTitle = (EditText)rootView.findViewById(R.id.et_title);
+
+        //spinner date and time
+        mDateAlams = new ArrayList<String>();
+        mDateAlams.add("Today");
+        mDateAlams.add("Tomorrow");
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
+        Date d = new Date();
+        String dayOfTheWeek = sdf.format(d);
+        mDateAlams.add("Next "+dayOfTheWeek);
+        mDateAlams.add("Other");
+        final ArrayAdapter<String> dateAdapter = new ArrayAdapter<String>(getActivity()
+                , android.R.layout.simple_spinner_item, mDateAlams);
+        dateAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sAlarmDate.setAdapter(dateAdapter);
+        sAlarmDate.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, final int position, long id) {
+                if(mDateAlams.get(position).equals("Other")) {
+                    DatePickerDialog mDatePicker;
+                    Calendar c = Calendar.getInstance();
+                    int mDay = c.get(Calendar.DAY_OF_MONTH);
+                    int mMonth = c.get(Calendar.MONTH);
+                    int mYear = c.get(Calendar.YEAR);
+
+                    mDatePicker = new DatePickerDialog(getActivity()
+                            , new DatePickerDialog.OnDateSetListener() {
+                        public void onDateSet(DatePicker datepicker
+                                , int selectedyear, int selectedmonth, int selectedday) {
+                            mDateAlams.set(position, String.format("%02d/%02d/%d"
+                                    , selectedday, selectedmonth, selectedyear));
+
+                            if (mDateAlams.indexOf("Other") < 0) mDateAlams.add("Other");
+                            dateAdapter.notifyDataSetChanged();
+                        }
+                    }, mYear, mMonth, mDay);
+                    mDatePicker.setTitle("Select Date");
+                    mDatePicker.show();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+        String tmp [] = {"09:00","13:00","17:00","20:00","Other"};
+        mTimeAlarms = new ArrayList<String>(Arrays.asList(tmp));
+        final ArrayAdapter<String> timeAdapter = new ArrayAdapter<String>(getActivity()
+                , android.R.layout.simple_spinner_item, mTimeAlarms);
+        timeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sAlarmTime.setAdapter(timeAdapter);
+        sAlarmTime.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, final int position, long id) {
+                if(mTimeAlarms.get(position).equals("Other")){
+                    TimePickerDialog mTimePicker;
+                    Calendar c = Calendar.getInstance();
+                    int hour = c.get(Calendar.HOUR_OF_DAY)+1;
+                    int minute = 0;
+                    mTimePicker = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
+                        @Override
+                        public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                            mTimeAlarms.set(position, String.format("%02d:%02d", selectedHour,
+                                    selectedMinute));
+                            if(mTimeAlarms.indexOf("Other") < 0) mTimeAlarms.add("Other");
+                            timeAdapter.notifyDataSetChanged();
+                        }
+                    }, hour, minute, true);//Yes 24 hour time
+                    mTimePicker.setTitle("Select Time");
+                    mTimePicker.show();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
 
         String createTime = DateUtil.convertStandarToVnDate(mNoteItem.getCreateTime());
         try {
@@ -88,8 +178,16 @@ public class NotePageFragment extends Fragment {
                 llSetAlarm.setVisibility(View.VISIBLE);
                 alarmTime = DateUtil.convertStandarToVnDate(alarmTime);
                 String[] list = alarmTime.split(" ");
-                etDate.setText(list[0]);
-                etTime.setText(list[1].substring(0, list[1].lastIndexOf(":")));
+                // set value for spinner
+                int indexDate = mDateAlams.size() - 1;
+                sAlarmDate.setSelection(indexDate);
+                mDateAlams.set(indexDate, list[0]);
+                mDateAlams.add("Other");
+
+                int indexTime = mTimeAlarms.size() - 1;
+                sAlarmTime.setSelection(indexTime);
+                mTimeAlarms.set(indexTime, list[1].substring(0, list[1].lastIndexOf(":")));
+                mTimeAlarms.add("Other");
             }
         } catch (Exception e){
             e.printStackTrace();
@@ -155,14 +253,6 @@ public class NotePageFragment extends Fragment {
         llSetAlarm.setVisibility(visibility);
     }
 
-    public void initAlarm(){
-        Calendar calendar = Calendar.getInstance();
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        String date = dateFormat.format(calendar.getTime());
-        etDate.setText(date);
-        etTime.setText(Define.DEFAULT_TIME);
-    }
-
     public void saveData(NoteItem lastNoteItem){
         String title = etTitle.getText().toString();
         String note = etNote.getText().toString();
@@ -187,7 +277,9 @@ public class NotePageFragment extends Fragment {
     public String getAlarmTime(){
         String alarmTime = "";
         if(tvAlarm.getVisibility() != View.VISIBLE){
-            alarmTime = etDate.getText() + " " + etTime.getText() + ":00";
+            String date = sAlarmDate.getSelectedItem().toString();
+            alarmTime = DateUtil.convertStringToDate(date) + " "
+                    + sAlarmTime.getSelectedItem().toString() + ":00";
             alarmTime = DateUtil.convertVnToStandarDate(alarmTime);
         }
         return alarmTime;

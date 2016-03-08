@@ -22,7 +22,7 @@ public class AlarmReceiver extends BroadcastReceiver{
 
         String title = intent.getStringExtra("note_title");
         int id = intent.getIntExtra("note_id", 0);
-        Log.i("Time","chay vao receiver");
+        Log.i("Time",id+"");
         NotificationManager notificationManager = (NotificationManager)context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         Intent launchIntent = new Intent(context, MainActivity.class);

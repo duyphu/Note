@@ -7,17 +7,17 @@ import android.widget.GridView;
 /**
  * Created by phund on 3/2/2016.
  */
-public class MyGridView  extends GridView {
+public class DynamicGridView extends GridView {
 
-    public MyGridView(Context context, AttributeSet attrs) {
+    public DynamicGridView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public MyGridView(Context context) {
+    public DynamicGridView(Context context) {
         super(context);
     }
 
-    public MyGridView(Context context, AttributeSet attrs, int defStyle) {
+    public DynamicGridView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 

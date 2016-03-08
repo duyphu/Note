@@ -11,7 +11,6 @@ import com.example.note.model.DialogItem;
 public class Define {
     public static final String PICTURE_NOTE_FOLDER = Environment.getExternalStorageDirectory()
             + "/Pictures" + "/PictureNote";
-    public static final String DEFAULT_TIME = "09:00";
     public static final CharSequence[] DIALOG_CHOOSE_COLOR_ITEMS = { "Take Photo", "Choose Photo"};
 
     public static final String DEFAULT_TITLE = "Untitle";

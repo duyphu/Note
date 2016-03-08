@@ -4,17 +4,20 @@
               android:id="@+id/ll_main_new"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
-    <com.example.note.custom.view.MyGridView
+
+    <com.example.note.custom.view.DynamicGridView
         android:id="@+id/gv_insert_picture"
         android:numColumns="3"
         android:padding="@dimen/text_padding"
         android:layout_margin="@dimen/grid_picture_margin"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:orientation="vertical"
         android:layout_height="wrap_content">
+
         <TextView
             android:id="@+id/tv_create_time"
             android:layout_width="wrap_content"
@@ -22,7 +25,8 @@
             android:padding="@dimen/text_padding"
             android:layout_gravity="right"
             android:text="@string/time_string"/>
-        <com.example.note.custom.view.MyEditText
+
+        <com.example.note.custom.view.UnderLineEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/title_hint"
@@ -33,7 +37,8 @@
             android:background="@null"
             android:lineSpacingExtra="@dimen/edittext_line_spacing"
             android:id="@+id/et_title"/>
-        <com.example.note.custom.view.MyEditText
+
+        <com.example.note.custom.view.UnderLineEditText
             android:paddingLeft="@dimen/text_note_padding"
             android:paddingRight="@dimen/text_note_padding"
             android:layout_width="match_parent"
@@ -43,15 +48,18 @@
             android:background="@null"
             android:lineSpacingExtra="@dimen/edittext_line_spacing"
             android:id="@+id/et_note"/>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_margin="@dimen/text_note_padding"
             android:layout_height="@dimen/alarm_height">
+
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:src="@drawable/ic_alarm"/>
+
             <TextView
                 android:id="@+id/tv_alarm"
                 android:textSize="@dimen/text_alarm_size"
@@ -60,41 +68,58 @@
                 android:layout_gravity="center_vertical"
                 android:text="@string/alarm_name"
                 android:onClick="tvAlarmOnClick"/>
+
             <LinearLayout
                 android:visibility="invisible"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:id="@+id/ll_set_alarm">
-                <EditText
-                    android:layout_width="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/activity_vertical_margin"
-                    android:inputType="date"
-                    android:focusable="false"
-                    android:onClick="etDateOnClick"
-                    android:layout_gravity="center_vertical"
-                    android:id="@+id/et_date"/>
-                <EditText
-                    android:layout_width="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/activity_vertical_margin"
-                    android:inputType="time"
-                    android:focusable="false"
-                    android:onClick="etTimeOnClick"
-                    android:layout_gravity="center_vertical"
-                    android:id="@+id/et_time"/>
+
+                <!--<EditText-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginLeft="@dimen/activity_vertical_margin"-->
+                    <!--android:inputType="date"-->
+                    <!--android:focusable="false"-->
+                    <!--android:onClick="etDateOnClick"-->
+                    <!--android:layout_gravity="center_vertical"-->
+                    <!--android:id="@+id/et_date"/>-->
+
+                <!--<EditText-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_marginLeft="@dimen/activity_vertical_margin"-->
+                    <!--android:inputType="time"-->
+                    <!--android:focusable="false"-->
+                    <!--android:onClick="etTimeOnClick"-->
+                    <!--android:layout_gravity="center_vertical"-->
+                    <!--android:id="@+id/et_time"/>-->
+                <Spinner
+                    android:id="@+id/s_alarm_date"
+                    style="@style/spinner_style">
+
+                </Spinner>
+
+                <Spinner
+                    android:id="@+id/s_alarm_time"
+                    style="@style/spinner_style">
+
+                </Spinner>
+
                 <ImageView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:src="@drawable/ic_close"
                     android:layout_gravity="center_vertical"
                     android:onClick="ivCloseOnClick"/>
+
             </LinearLayout>
 
         </LinearLayout>
 
     </LinearLayout>
+
 </LinearLayout>

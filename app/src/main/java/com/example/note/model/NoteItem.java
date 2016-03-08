@@ -123,41 +123,30 @@ public class NoteItem {
         } else return false;
     }
 
-    private HashMap<String, String> convertToHashMap(){
-        if(mTitle == ""){
-            if(mNote != "") mTitle = mNote;
-            else mTitle = Define.DEFAULT_TITLE;
-        }
-        HashMap<String,String> hashMap = new HashMap<String, String>();
-        hashMap.put(Define.COLUMN_ALARM_TIME, mAlarmTime);
-        hashMap.put(Define.COLUMN_CREATE_TIME,mCreateTime);
-        hashMap.put(Define.COLUMN_COLOR,mColor);
-        hashMap.put(Define.COLUMN_PICTURES,mPictures.toString().replaceAll("\\s+|\\[|\\]", ""));
-        hashMap.put(Define.COLUMN_NOTE,mNote);
-        hashMap.put(Define.COLUMN_TITLE, mTitle);
-        return hashMap;
-    }
     // create new row in DB
     public void create(Context context){
         if (isCreate()) {
             NoteTable noteTable = new NoteTable(context);
-            mTitle = mTitle.equals("") ? ((mNote.equals("") ? Define.DEFAULT_TITLE : mNote)) : mTitle;
-            noteTable.insert(convertToHashMap());
+            mTitle = mTitle.equals("")
+                    ? ((mNote.equals("") ? Define.DEFAULT_TITLE : mNote)) : mTitle;
+            noteTable.insert(this);
 
             // tao thong bao
             int lastId = noteTable.getLastId();
-            Log.i("lastId", lastId+"");
             createNotification(context, lastId);
         }
     }
 
     public void update(Context context){
         NoteTable noteTable = new NoteTable(context);
-        noteTable.update(convertToHashMap(), mId + "");
+        mTitle = mTitle.equals("")
+                ? ((mNote.equals("") ? Define.DEFAULT_TITLE : mNote)) : mTitle;
+        noteTable.update(this);
         createNotification(context, mId);
     }
 
     public void createNotification(Context context, int id){
+        Log.i("Note id", id+"");
         if(!mAlarmTime.equals("")){
             //kiem tra alarmtime lon hon hien tai
             try {
